@@ -1,26 +1,26 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import NavBar from './components/NavBar.vue';
+import {RouterView } from 'vue-router';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    NavBar,
+    RouterView,
   }
+
 }
 </script>
 
+<template>
+  <NavBar></NavBar>
+  <RouterView></RouterView>
+  <footer> Soy el footer, no soy necesario pero es para probar errores</footer>
+</template>
+
+
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
