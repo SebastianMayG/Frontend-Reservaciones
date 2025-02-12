@@ -1,12 +1,14 @@
 <script>
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar.vue';
+import FooterComponent from './components/FooterComponent.vue';
 import {RouterView } from 'vue-router';
 
 export default {
   name: 'App',
   components: {
     NavBar,
+    FooterComponent,
     RouterView,
   }
 
@@ -16,9 +18,8 @@ export default {
 <template>
   <NavBar></NavBar>
   <RouterView></RouterView>
-  <footer> Soy el footer, no soy necesario pero es para probar errores</footer>
+  <FooterComponent></FooterComponent>
 </template>
-
 
 
 <style>
