@@ -1,5 +1,10 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+
+  const goToRegister = () => {
+      window.location.href = '/SingIn';
+    };
+
 </script>
 
 <template>
@@ -17,16 +22,12 @@ import { RouterLink } from 'vue-router';
         <li class="nav-item">
             <RouterLink to = "/" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle palabras" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Usuario
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item " href="#">no se</a></li>
-            <li><a class="dropdown-item " href="#">lo puso luis en el figma</a></li>
-            <li><a class="dropdown-item" href="#">preguntenle a el</a></li>
-          </ul>
+        <li>
+          <RouterLink to = "/IniciarSesion"  class="nav-link active palabras">Iniciar sesion</RouterLink>
         </li>
+          <button type="button" class="btn btn-outline-success ms-3" @click="goToRegister">
+              Regístrate
+            </button>
       </ul>
     </div>
   </div>
