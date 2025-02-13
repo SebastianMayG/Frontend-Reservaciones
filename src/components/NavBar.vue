@@ -2,7 +2,7 @@
 import { RouterLink } from 'vue-router';
 
   const goToRegister = () => {
-      window.location.href = '/IniciarSesion';
+      window.location.href = '/SingIn';
     };
 
 </script>
@@ -23,7 +23,7 @@ import { RouterLink } from 'vue-router';
             <RouterLink to = "/" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
         </li>
         <li>
-          <RouterLink to = "/"  class="nav-link active palabras">Iniciar sesion</RouterLink>
+          <RouterLink to = "/IniciarSesion"  class="nav-link active palabras">Iniciar sesion</RouterLink>
         </li>
           <button type="button" class="btn btn-outline-success ms-3" @click="goToRegister">
               Regístrate

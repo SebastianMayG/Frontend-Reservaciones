@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-    <div class="center-elements mb-3">
+    <div class="center-elements">
         <div class="center-elements m-5">
             <img src="" alt="">
             <div style="border-radius: 50%; background-color: gray; width: 2rem; height: 2rem;"></div>
