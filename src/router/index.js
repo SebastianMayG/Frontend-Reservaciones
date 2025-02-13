@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import VisualizarReservas from '../view/VisualizarReservas.vue';
 import CrearReservacion from '../view/CrearReservacion.vue';
+import IniciarSesion from '@/view/IniciarSesion.vue';
 
 const routes = [
     {
@@ -13,6 +14,11 @@ const routes = [
         name : "CrearReservacion",
         component: CrearReservacion
     },
+    {
+        path: '/IniciarSesion',
+        name : "IniciarSesion",
+        component: IniciarSesion
+    }
 ];
 
 const router = createRouter({
