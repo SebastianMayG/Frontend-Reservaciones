@@ -20,7 +20,7 @@ import { RouterLink } from 'vue-router';
             <RouterLink to = "/VisualizarReservas" class="nav-link active palabras" aria-current="page" >Visualizar Reservas</RouterLink>
         </li>
         <li class="nav-item">
-            <RouterLink to = "/" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
+            <RouterLink to = "/CrearReservacion" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
         </li>
         <li>
           <RouterLink to = "/IniciarSesion"  class="nav-link active palabras">Iniciar sesion</RouterLink>
