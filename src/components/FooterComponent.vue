@@ -1,7 +1,7 @@
 <template>
     <footer class="bg-dark text-light text-center py-3">
       <div class="container">
-        <p class="mb-1">&copy; 2024 - Todos los derechos reservados</p>
+        <p class="mb-1">&copy; 2025 - Todos los derechos reservados</p>
         <ul class="list-inline">
           <li class="list-inline-item">
             <a href="https://github.com/SebastianMayG" target="_blank" class="text-light">SebastianMG</a>

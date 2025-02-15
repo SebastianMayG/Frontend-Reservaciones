@@ -12,18 +12,31 @@ export default {
 
 <template>
     <div class="container d-flex justify-content-center">
-        <div class='card w-50 '>
+        <div class='card w-50 bordes'>
             <form action="crear_reservacion" method="post">
-                <label for="nameSala">Nombre de la Sala: </label>
-                <select name="nameSala" id="nameSala">
-                    <option value="CIC Sala 1">CIC Sala 1</option>
-                    <option value="CIC Sala 2">CIC Sala 2</option>
-                    <option value="CIC Sala 3">CIC Sala 3</option>
-                    <option value="CIC Sala 4">CIC Sala 4</option>
-                    <option value="CIC Sala de actos">CIC Sala de actos</option>
-                </select>
-                <label for="capacidad">Capacidad: </label>
-                <input type="number" id="capacidad" name="capacidad">
+                <div class='row m-2'>
+                    <select name="nameSala" id="nameSala" required>
+                        <option value="" disabled selected>Seleccione una Sala</option>
+                        <option value="CIC Sala 1">CIC Sala 1</option>
+                        <option value="CIC Sala 2">CIC Sala 2</option>
+                        <option value="CIC Sala 3">CIC Sala 3</option>
+                        <option value="CIC Sala 4">CIC Sala 4</option>
+                        <option value="CIC Sala de actos">CIC Sala de actos</option>
+                    </select>
+                </div>
+                <div class='row m-2'>
+                    <input type="number" id="capacidad" name="capacidad" placeholder="Capacidad" required>
+                </div>
+                <div class='row'>
+                    <div class="col-6">
+                        <input type="date" id="fecha" name="fecha" placeholder="Fecha" required>
+                    </div>
+                    <div class="col-6">
+                        <input type="time" id="hora" name="hora" placeholder="Hora" required>
+                    </div>
+                
+                </div>
+
             </form>
 
 
@@ -33,4 +46,8 @@ export default {
 
 </template>
 
-<style></style>
+<style>
+.bordes {
+    border-radius: 10px;
+}
+</style>

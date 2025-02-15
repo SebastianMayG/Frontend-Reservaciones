@@ -15,7 +15,7 @@ import { RouterLink } from 'vue-router';
             <RouterLink to = "/VisualizarReservas" class="nav-link active palabras" aria-current="page" >Visualizar Reservas</RouterLink>
         </li>
         <li class="nav-item">
-            <RouterLink to = "/" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
+            <RouterLink to = "/CrearReservacion" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle palabras" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
