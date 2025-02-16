@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import VisualizarReservas from '../view/VisualizarReservas.vue';
 import CrearReservacion from '../view/CrearReservacion.vue';
+import IniciarSesion from '../view/IniciarSesion.vue';
+import SingIn from '../view/SingIn.vue';
 import AgendarReservaciones from '@/view/AgendarReservaciones.vue';
-import IniciarSesion from '@/view/IniciarSesion.vue';
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
         path: '/IniciarSesion',
         name : "IniciarSesion",
         component: IniciarSesion
+    }, 
+    {
+        path: '/SingIn',
+        name : "SingIn",
+        component: SingIn
     }
 ];
 

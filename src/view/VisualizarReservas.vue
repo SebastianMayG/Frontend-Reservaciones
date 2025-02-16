@@ -11,8 +11,8 @@ export default {
 </script>
 
 <template>
-<div class= 'container'>
-    <table class="table table-dark table-striped">
+<div class= 'table-responsive'>
+    <table class="table table-dark table-striped table-responsive">
         <thead>
             <tr>
                 <td>Nombre:</td>

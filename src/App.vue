@@ -16,9 +16,9 @@ export default {
 </script>
 
 <template>
-  <NavBar></NavBar>
+  <NavBar v-if="!['/IniciarSesion', '/SingIn'].includes($route.path)" ></NavBar>
   <RouterView></RouterView>
-  <FooterComponent></FooterComponent>
+  <FooterComponent v-if="$route.path !== '/IniciarSesion'"></FooterComponent>
 </template>
 
 
