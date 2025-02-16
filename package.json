@@ -13,6 +13,10 @@
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
+<<<<<<< HEAD
+=======
+    "@fullcalendar/vue3": "^6.1.15",
+>>>>>>> main
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
