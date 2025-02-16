@@ -1,32 +1,36 @@
 <script></script>
 
 <template>
-    <div class="m-3 form-container">
-        <div>
+    <div class="m-3 form-container justify-content-center">
+        <!-- <div>
             <img src="https://pbs.twimg.com/media/GEQ1w0rWoAA4-tr?format=jpg&name=small" alt="" class="img-rigth img-fluid">
-        </div>
+        </div> -->
         <div class="d-flex justify-content-center">
             <form class="shadow-backgrd border-r p-4 form-main">
-                <h1>Registrate en MicroReservas</h1>
-                <div class="mb-3 d-flex">
-                    <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png" class="icon m-2 border-r ">
-                    <input type="text" class="form-control" placeholder="Nombre">
-                </div>
-                <div class="mb-3 d-flex">
-                    <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png" class="icon m-2 border-r">
-                    <input type="text" class="form-control" placeholder="Matricula">
-                </div>
-                <div class="mb-3 d-flex">
-                    <img src="https://icons.veryicon.com/png/o/education-technology/power-customer-label/email-108.png" class="icon m-2">
-                    <input type="text" class="form-control" placeholder="Example@example.com">
-                </div>
-                <div class="mb-3 d-flex">
-                    <img src="https://icons.veryicon.com/png/o/application/a-group-of-common-linear-icon/password-17.png" class="icon m-2">
-                    <input type="text" class="form-control" placeholder="Contraseña">
-                </div>
-                <div class="mb-3 d-flex flex-column">
-                    <button class="btn btn-success"> Registrate </button>
-                    <a href="/IniciarSesion">Iniciar sesión</a>
+                <div class="row-6">
+                    <div class="col-12">
+                        <h1>Registrate en MicroReservas</h1>
+                    </div>
+                    <div class="col-12 mb-3 d-flex">
+                        <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png" class="icon m-2 border-r ">
+                        <input type="text" class="form-control" placeholder="Nombre" required>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png" class="icon m-2 border-r">
+                        <input type="number" class="form-control" placeholder="Matricula" required>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <img src="https://icons.veryicon.com/png/o/education-technology/power-customer-label/email-108.png" class="icon m-2">
+                        <input type="email" class="form-control" placeholder="Example@example.com" required>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <img src="https://icons.veryicon.com/png/o/application/a-group-of-common-linear-icon/password-17.png" class="icon m-2">
+                        <input type="password" class="form-control" placeholder="Contraseña" required>
+                    </div>
+                    <div class="mb-3 d-flex flex-column">
+                        <button class="btn btn-success"> Registrate </button>
+                        <a href="/IniciarSesion">Iniciar sesión</a>
+                    </div>
                 </div>
             </form>
         </div>

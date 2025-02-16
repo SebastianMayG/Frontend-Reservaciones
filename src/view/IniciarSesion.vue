@@ -2,13 +2,13 @@
     <div class="container">  <div class="d-flex flex-column align-items-center mt-5 mb-3"> <img src="" alt="" class="mb-2"> <div style="border-radius: 50%; background-color: gray; width: 2rem; height: 2rem;" class="mb-2"></div> <a href="/" class="text-decoration-none">MicroReservas</a>
         </div>
         <div class="login-form mx-auto"> <form>
-                <div class="mb-3">
-                    <label for="EmailInput" class="form-label">Correo Electronico</label>
-                    <input type="email" class="form-control" id="EmailInput">
+                <div class="mb-3 d-flex">
+                    <img src="https://icons.veryicon.com/png/o/education-technology/power-customer-label/email-108.png" class="icon m-2">
+                    <input type="email" class="form-control" id="EmailInput" placeholder="Example@example.com" required>
                 </div>
-                <div class="mb-3">
-                    <label for="passwordInput" class="form-label">Contrasena</label>
-                    <input type="password" class="form-control" id="passwordInput">
+                <div class="mb-3 d-flex">
+                    <img src="https://icons.veryicon.com/png/o/application/a-group-of-common-linear-icon/password-17.png" class="icon m-2">
+                    <input type="password" class="form-control" id="passwordInput" placeholder="Contraseña" required>
                 </div>
                 <div class="mb-3 d-flex flex-column align-items-center"> <button class="btn btn-success mb-2">Ingresar</button> <p class="mb-1">¿No tienes cuenta?</p> 
                     <a href="/SingIn" class="link text-decoration-none">Registrarse</a>
@@ -33,6 +33,11 @@
 p, a {
     color: #265A9C;
     list-style: none;
+}
+
+.icon {
+    width: 2rem;
+    height: 2rem;
 }
 
 </style>
