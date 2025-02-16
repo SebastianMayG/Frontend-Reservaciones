@@ -13,7 +13,10 @@ export default {
     return {
       calendarOptions: {
         plugins: [ dayGridPlugin, interactionPlugin,TimeGridPlugin,ListPlugin ],
-        initialView: 'dayGridMonth'
+        initialView: 'dayGridMonth',
+        dateClick: () => {
+            window.location.href = "/CrearReservacion";         
+        }
       }
     }
   }
