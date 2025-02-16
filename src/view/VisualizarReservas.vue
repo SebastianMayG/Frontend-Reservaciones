@@ -22,8 +22,12 @@ export default {
                 <td>Fecha y hora</td>
                 <td>Opciones</td>
             </tr>
-
         </thead>
+        <tbody>
+            <tr>
+
+            </tr>
+        </tbody>
     </table>
 </div>
    

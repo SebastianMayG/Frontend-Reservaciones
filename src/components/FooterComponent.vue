@@ -1,5 +1,5 @@
 <template>
-    <footer class="bg-dark text-light text-center py-3">
+    <footer class="bg-dark text-light text-center py-1">
       <div class="container">
         <p class="mb-1">&copy; 2025 - Todos los derechos reservados</p>
         <ul class="list-inline">
@@ -19,9 +19,10 @@
   
   <style scoped>
   footer {
-    position: fixed;
+    position: sticky;
     bottom: 0;
     width: 100%;
+    z-index: 1;
   }
   a{
     text-decoration: none;
