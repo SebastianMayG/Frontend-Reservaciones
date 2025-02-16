@@ -17,7 +17,7 @@ export default {
 
 <template>
     <div class="container d-flex justify-content-center">
-        <div class='card p-3 w-50 bordes'>
+        <div class='card p-3 bordes shadow-backgrd '>
             <form action="crear_reservacion" method="post">
                 <div class="row mb-3">
                     <div class="col-12">
@@ -81,4 +81,7 @@ export default {
 .bordes {
     border-radius: 10px;
 }
+.shadow-backgrd {
+        box-shadow: 0px 4px 5px gray;
+    }
 </style>
