@@ -16,12 +16,25 @@ export default {
 </script>
 
 <template>
-  <NavBar v-if="!['/IniciarSesion', '/SingIn'].includes($route.path)" ></NavBar>
-  <RouterView></RouterView>
-  <FooterComponent v-if="$route.path !== '/IniciarSesion'"></FooterComponent>
+  <div class="administrar">
+    <header>
+      <NavBar v-if="!['/IniciarSesion', '/SingIn'].includes($route.path)" ></NavBar>
+    </header>
+    <main>
+          <RouterView></RouterView>
+    </main>
+    <footer>
+      <FooterComponent v-if="$route.path !== '/IniciarSesion'"></FooterComponent>
+    </footer>
+  </div>
+
 </template>
 
 
 <style>
-
+.administrar{
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
 </style>
