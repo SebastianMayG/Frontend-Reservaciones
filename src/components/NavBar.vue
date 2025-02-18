@@ -1,9 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 
-  const goToRegister = () => {
-      window.location.href = '/SingIn';
-    };
 
 </script>
 
@@ -22,13 +19,11 @@ import { RouterLink } from 'vue-router';
         <li class="nav-item">
             <RouterLink to = "/CrearReservacion" class="nav-link active palabras" aria-current="page" >Crear Reservaciones</RouterLink>
         </li>
-        <li>
-          <RouterLink to = "/IniciarSesion"  class="nav-link active palabras">Iniciar sesion</RouterLink>
-        </li>
-          <button type="button" class="btn btn-outline-success ms-3" @click="goToRegister">
-              Regístrate
-            </button>
       </ul>
+        <div class="ms-auto d-flex align-items-center"> 
+          <RouterLink to="/IniciarSesion" class="btn btn-outline-light me-2">Iniciar sesión</RouterLink>
+          <RouterLink to="/SingIn" class="btn btn-outline-light me-2">Regístrate</RouterLink>
+        </div>
     </div>
   </div>
 </nav>
@@ -41,4 +36,14 @@ import { RouterLink } from 'vue-router';
  .margen-bottom{
     margin-bottom: 2rem;
  }
+ .btn-outline-light {
+  border-color: white;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-outline-light:hover {
+  background-color: white;
+  color: #265A9C;
+}
 </style>
