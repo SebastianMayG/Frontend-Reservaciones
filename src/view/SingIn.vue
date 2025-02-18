@@ -1,9 +1,9 @@
 <script></script>
 
 <template>
-    <div class="m-3 form-container justify-content-center">
+    <div class="m-4 form-container justify-content-center">
         <!-- <div>
-            <img src="https://pbs.twimg.com/media/GEQ1w0rWoAA4-tr?format=jpg&name=small" alt="" class="img-rigth img-fluid">
+            <img src="@/assets/register.jpg" alt="" class="img-rigth img-fluid">
         </div> -->
         <div class="d-flex justify-content-center">
             <form class="shadow-backgrd border-r p-4 form-main">
