@@ -12,7 +12,7 @@ export default {
 
 <template>
 <div class= 'table-responsive'>
-    <table class="table table-dark table-striped table-responsive">
+    <table class="table table-dark table-striped table-responsive ">
         <thead>
             <tr>
                 <td>Nombre:</td>

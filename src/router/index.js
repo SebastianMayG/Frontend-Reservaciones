@@ -4,6 +4,7 @@ import CrearReservacion from '../view/CrearReservacion.vue';
 import IniciarSesion from '../view/IniciarSesion.vue';
 import SingIn from '../view/SingIn.vue';
 import AgendarReservaciones from '@/view/AgendarReservaciones.vue';
+import TusReservas from '@/view/TusReservas.vue';
 
 const routes = [
     {
@@ -30,7 +31,12 @@ const routes = [
         path: '/SingIn',
         name : "SingIn",
         component: SingIn
-    }
+    },
+    {
+        path:'/TusReservacion',
+        name: "TusReservacion",
+        component: TusReservas
+    },
 ];
 
 const router = createRouter({
