@@ -45,7 +45,15 @@ export default {
                             <input type="date" id="fecha" class="form-control" name="fecha" readonly :value="date">
                         </div>
                         <div class="mb-3">
-                            <input type="time" id="hora" class="form-control" name="hora">
+                            <select name="hour" id="hour-input">
+                                <option value="" disable selected> Seleccione un horario </option>
+                                <option value="1"> 07:00 - 09:00</option>
+                                <option value="2"> 09:00 - 11:00</option>
+                                <option value="3"> 11:00 - 13:00</option>
+                                <option value="4"> 13:00 - 15:00</option>
+                                <option value="5"> 15:00 - 17:00</option>
+                                
+                            </select>
                         </div>
                         <div class="mb-3">
                             <input class="form-check-input" type="checkbox" id="reservarConMaestro" v-model="reservarConMaestro">
