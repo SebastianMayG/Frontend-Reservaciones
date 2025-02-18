@@ -57,8 +57,8 @@ export default {
           },
           {
             title: 'CIC Sala 1',
-            start: '2025-02-20T07:00:00',
-            end: '2025-02-20T09:00:00',
+            start: '2025-02-20T09:00:00',
+            end: '2025-02-20T11:00:00',
             backgroundColor: 'green',
             borderColor: 'green'
           },
