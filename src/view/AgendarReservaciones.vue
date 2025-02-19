@@ -29,6 +29,7 @@ export default {
         initialView: 'dayGridMonth',
         dateClick: (info) => {
           this.date = info.dateStr;
+          console.log(info)
           const modal = new bootstrap.Modal(document.getElementById('reservacionModal'));
           modal.show();
         },
