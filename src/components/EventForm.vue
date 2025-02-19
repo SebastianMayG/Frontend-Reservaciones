@@ -32,7 +32,7 @@ export default {
                                 <option value="CIC Sala 2">CIC Sala 2</option>
                                 <option value="CIC Sala 3">CIC Sala 3</option>
                                 <option value="CIC Sala 4">CIC Sala 4</option>
-                                <option value="CIC Sala de actos">Sala de actos</option>
+                                <option value="Sala de actos">Sala de Actos</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -56,7 +56,7 @@ export default {
                         </div>
                         <div class="mb-3">
                             <input class="form-check-input" type="checkbox" id="reservarConMaestro" v-model="reservarConMaestro">
-                            <label class="form-check-label" for="reservarConMaestro">
+                            <label class="form-check-label" for="reservarConMaestro" style="margin-left: 0.5rem;">
                                 Reservar con maestro
                             </label>
                         </div>

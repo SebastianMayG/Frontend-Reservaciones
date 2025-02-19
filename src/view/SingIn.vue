@@ -37,7 +37,7 @@
     </div>
 </template>
 
-<style>
+<style scoped>
 
     a {
         margin-top: 1rem;

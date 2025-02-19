@@ -4,19 +4,13 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 export default {
     name: 'ModifyEventForm',
     props: {
-        event: Object //Se espera un objeto como entrada porque los eventos son de este tipo
-        /*
-            Esto facilita la recopilacion de la informacion
-            Hora,
-            Titulo
-            Fecha
-            ETC
-        */ 
+        event: Object
     },
     data() {
         return {
             reservarConMaestro: false,
-            selectedHour: null
+            selectedHour: null,
+            selectedTitle: null
         };
     },
     computed: {
@@ -34,14 +28,6 @@ export default {
             }
             return null;
         },
-        endTime() {
-            if (this.event && this.event.end) {
-                const hours = this.event.end.getHours().toString().padStart(2, '0');
-                const minutes = this.event.end.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-            return null;
-        }
     },
     methods: {
         updateSelectedHour() {
@@ -68,9 +54,21 @@ export default {
         console.log("this.event:", this.event);
         console.log("this.event.start:", this.event?.start);
         this.updateSelectedHour();
+        if (this.event && this.event.title) {
+            this.selectedTitle = this.event.title;
+        }
     },
     watch: {
-        event: 'updateSelectedHour'
+        event: {
+            handler: 'updateSelectedHour',
+            immediate: true
+        },
+        'event.title': {
+            handler(newTitle) {
+                this.selectedTitle = newTitle;
+            },
+            immediate: true
+        }
     }
 };
 </script>
@@ -86,7 +84,14 @@ export default {
                 <div class="modal-body">
                     <form action="modificar_reservacion" method="post">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="title" name="title" :value="event?.title" placeholder="Titulo" required>
+                            <select class="form-select" name="nameSala" id="nameSala" required v-model="selectedTitle">
+                                <option value="" disabled selected>Seleccione una Sala</option>
+                                <option value="CIC Sala 1">CIC Sala 1</option>
+                                <option value="CIC Sala 2">CIC Sala 2</option>
+                                <option value="CIC Sala 3">CIC Sala 3</option>
+                                <option value="CIC Sala 4">CIC Sala 4</option>
+                                <option value="Sala de Actos">Sala de Actos</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <input type="date" id="fecha" class="form-control" name="fecha" readonly :value="startDate">
