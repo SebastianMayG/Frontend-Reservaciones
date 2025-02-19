@@ -4,7 +4,7 @@ import CrearReservacion from '../view/CrearReservacion.vue';
 import IniciarSesion from '../view/IniciarSesion.vue';
 import SingIn from '../view/SingIn.vue';
 import AgendarReservaciones from '@/view/AgendarReservaciones.vue';
-import TusReservas from '@/view/TusReservas.vue';
+import TusReservaciones from '@/view/TusReservaciones.vue';
 
 const routes = [
     {
@@ -33,9 +33,9 @@ const routes = [
         component: SingIn
     },
     {
-        path:'/TusReservacion',
-        name: "TusReservacion",
-        component: TusReservas
+        path:'/TusReservaciones',
+        name: "TusReservaciones",
+        component: TusReservaciones
     },
 ];
 

@@ -18,7 +18,7 @@ export default {
 <template>
   <div class="administrar">
     <header>
-      <NavBar v-if="!['/IniciarSesion', '/SingIn', '/AgendarReservaciones'].includes($route.path)" ></NavBar>
+      <NavBar v-if="!['/IniciarSesion', '/SingIn', '/AgendarReservaciones', '/TusReservaciones'].includes($route.path)" ></NavBar>
     </header>
     <main>
           <RouterView></RouterView>

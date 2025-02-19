@@ -4,7 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import TimeGridPlugin from '@fullcalendar/timegrid'
 import ListPlugin from '@fullcalendar/list'
-import EventForm from '@/components/EventForm.vue';
+import EventForm from '@/components/EventForm.vue'
+import NavBarUsuario from '@/components/NavBarUsuario.vue'
 //import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 //import NavBarUsuario from '@/components/NavBarUsuario.vue'
 
@@ -12,6 +13,7 @@ export default {
     components: {
         FullCalendar,
         EventForm,
+        NavBarUsuario
     },
     data() {
         return {
@@ -49,7 +51,8 @@ export default {
 </script>
 
 <template>
-    <div class="container">
+    <NavBarUsuario/>
+    <div class="container mb-5">    
         <!-- Calendario -->
         <FullCalendar :options="calendarOptions" />
 
