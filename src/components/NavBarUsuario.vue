@@ -12,22 +12,15 @@ import { RouterLink } from 'vue-router';
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
-            <RouterLink to = "/AgendarReservas" class="nav-link active palabras" aria-current="page" >Agendar Reservas</RouterLink>
+            <RouterLink to = "/AgendarReservaciones" class="nav-link active palabras" aria-current="page" >Agendar Reservas</RouterLink>
         </li>
         <li class="nav-item">
-            <RouterLink to = "/TusReservacion" class="nav-link active palabras" aria-current="page" >Tus Reservaciones</RouterLink>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle palabras" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Usuario
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item " href="#">no se</a></li>
-            <li><a class="dropdown-item " href="#">lo puso luis en el figma</a></li>
-            <li><a class="dropdown-item" href="#">preguntenle a el</a></li>
-          </ul>
+            <RouterLink to = "/TusReservaciones" class="nav-link active palabras" aria-current="page" >Tus Reservaciones</RouterLink>
         </li>
       </ul>
+      <div class="ms-auto d-flex align-items-center">
+          <RouterLink to="/IniciarSesion" class="btn btn-outline-light me-2">Cerrar sesión</RouterLink>
+      </div>
     </div>
   </div>
 </nav>
@@ -40,4 +33,14 @@ import { RouterLink } from 'vue-router';
  .margen-bottom{
     margin-bottom: 2rem;
  }
+ .btn-outline-light {
+  border-color: white;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-outline-light:hover {
+  background-color: white;
+  color: #265A9C;
+}
 </style>
