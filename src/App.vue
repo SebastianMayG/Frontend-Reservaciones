@@ -3,6 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import NavBar from './components/NavBar.vue';
 import FooterComponent from './components/FooterComponent.vue';
 import {RouterView } from 'vue-router';
+import SalasComponent from './components/SalasComponent.vue';
 
 export default {
   name: 'App',
@@ -10,6 +11,7 @@ export default {
     NavBar,
     FooterComponent,
     RouterView,
+    SalasComponent,
   }
 
 }
@@ -22,6 +24,7 @@ export default {
     </header>
     <main>
           <RouterView></RouterView>
+          <SalasComponent></SalasComponent>
     </main>
     <footer>
       <FooterComponent v-if="$route.path !== '/IniciarSesion'"></FooterComponent>
