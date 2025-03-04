@@ -47,7 +47,7 @@ export default {
     methods: {
         async registerUser() {
             console.log(JSON.stringify(this.form));
-            fetch('http://127.0.0.1:8000/api/users', {
+            fetch('http://127.0.0.1:8000/api/register', {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

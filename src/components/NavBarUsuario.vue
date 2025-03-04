@@ -12,9 +12,6 @@ import { RouterLink } from 'vue-router';
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
-            <RouterLink to = "/AgendarReservaciones" class="nav-link active palabras" aria-current="page" >Agendar Reservas</RouterLink>
-        </li>
-        <li class="nav-item">
             <RouterLink to = "/TusReservaciones" class="nav-link active palabras" aria-current="page" >Tus Reservaciones</RouterLink>
         </li>
       </ul>
