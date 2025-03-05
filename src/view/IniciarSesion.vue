@@ -52,12 +52,12 @@
           });
   
           const data = await response.json();
-  
+          console.log(data);
           if (response.ok) {
             const token = data.token;
             localStorage.setItem('token', token);
             localStorage.setItem('rol',data.data.role);
-  
+            localStorage.setItem('id',data.data.id);
             this.setAuthHeader(token);
             if(localStorage.getItem('rol') == 1){
               this.$router.push('/VisualizarReservas');
