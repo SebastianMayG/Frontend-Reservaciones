@@ -56,7 +56,7 @@ export default {
                     date: this.reservacionData.fecha,
                     start_time: start_time,
                     end_time: end_time,
-                    user_id: parseInt(localStorage.getItem('rol'))
+                    user_id: parseInt(localStorage.getItem('id'))
                 };
                 await crearReservacion(reservacion);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('reservacionModal'));

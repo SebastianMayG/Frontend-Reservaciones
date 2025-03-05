@@ -28,6 +28,8 @@ const logout = async () => {
 
     if (response.ok) {
       localStorage.removeItem('token');
+      localStorage.removeItem('rol');
+      localStorage.removeItem('id');
       router.push('/IniciarSesion');
     } else {
       console.error('Error al cerrar sesion:', response);
