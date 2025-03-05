@@ -59,7 +59,8 @@ export default {
                     "password": this.form.password
                 })
             });
-        }
+        },
+
     }
 };
 </script>

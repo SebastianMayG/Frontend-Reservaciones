@@ -2,10 +2,12 @@
 
 export async function crearReservacion(reservacionData) {
     try {
-        console.log(reservacionData)
+      const token = localStorage.getItem('token');
+      console.log(JSON.stringify(reservacionData))
       const response = await fetch('http://127.0.0.1:8000/api/reservations', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(reservacionData)

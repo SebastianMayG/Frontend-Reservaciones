@@ -17,49 +17,98 @@ export default {
                 capacidad: null,
                 fecha: this.date,
                 hour: '',
-            }
+            },
+            horariosDisponibles: [], // Array para almacenar los horarios disponibles
+            todasLasReservaciones: [], // Array para almacenar las reservaciones existentes
+            salas: [] // Array para almacenar las salas obtenidas del backend
         };
     },
     methods: {
+        async obtenerSalas() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                this.salas = data.data; // Asumiendo que la respuesta es un array de salas
+            } catch (error) {
+                console.error('Error al obtener las salas:', error.message);
+            }
+        },
         async guardarReservacion() {
             try {
-                // Mapear los datos del formulario al formato esperado por tu backend
                 const reservacion = {
-                    space_id: this.getSalaId(this.reservacionData.nameSala), // Ajusta según tu lógica de sala_id
+                    space_id: this.getSalaId(this.reservacionData.nameSala),
                     date: this.reservacionData.fecha,
                     start_time: this.getHoraInicio(this.reservacionData.hour),
                     end_time: this.getHoraFin(this.reservacionData.hour),
-                    user_id: 1, // Asume un user_id por ahora (deberías obtenerlo del usuario autenticado)
+                    user_id: parseInt(localStorage.getItem('rol'))
                 };
                 await crearReservacion(reservacion);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('reservacionModal'));
                 modal.hide();
                 window.location.reload();
-
             } catch (error) {
-                // Manejar el error, por ejemplo, mostrar un mensaje al usuario
                 console.error('Error al guardar la reservación:', error);
             }
         },
-        getSalaId(salaName) {
-            // Lógica para obtener el sala_id basado en el nombre de la sala
-            switch (salaName) {
-                case 'CIC Sala 1':
-                    return 1;
-                case 'CIC Sala 2':
-                    return 2;
-                case 'CIC Sala 3':
-                    return 3;
-                case 'CIC Sala 4':
-                    return 4;
-                case 'Sala de actos':
-                    return 5;
-                default:
-                    return null;
+        async obtenerReservacionesExistente(salaId, fecha) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.data; // Retorna las reservaciones existentes
+            } catch (error) {
+                console.error('Error al obtener reservaciones:', error.message);
+                return [];
             }
         },
+        async actualizarHorariosDisponibles() {
+            if (this.reservacionData.nameSala && this.reservacionData.fecha) {
+                const salaId = this.getSalaId(this.reservacionData.nameSala);
+                this.todasLasReservaciones = await this.obtenerReservacionesExistente(salaId, this.reservacionData.fecha);
+
+                // Definir todos los horarios posibles
+                const todosLosHorarios = [
+                    { value: '1', start: '07:00', end: '09:00' },
+                    { value: '2', start: '09:00', end: '11:00' },
+                    { value: '3', start: '11:00', end: '13:00' },
+                    { value: '4', start: '13:00', end: '15:00' },
+                    { value: '5', start: '15:00', end: '17:00' }
+                ];
+
+                // Filtrar horarios disponibles
+                this.horariosDisponibles = todosLosHorarios.filter(horario => {
+                    return !this.todasLasReservaciones.some(reserva => {
+                        return reserva.start_time === horario.start && reserva.end_time === horario.end;
+                    });
+                });
+            }
+        },
+        getSalaId(salaName) {
+            const sala = this.salas.find(sala => sala.name === salaName);
+            return sala ? sala.id : null;
+        },
         getHoraInicio(hour) {
-            // Lógica para obtener la hora de inicio basada en la selección de hora
             switch (hour) {
                 case '1':
                     return '07:00';
@@ -76,7 +125,6 @@ export default {
             }
         },
         getHoraFin(hour) {
-            // Lógica para obtener la hora de fin basada en la selección de hora
             switch (hour) {
                 case '1':
                     return '09:00';
@@ -91,13 +139,28 @@ export default {
                 default:
                     return null;
             }
+        },
+        actualizarDescripcionYCapacidad() {
+            const salaSeleccionada = this.salas.find(sala => sala.name === this.reservacionData.nameSala);
+            if (salaSeleccionada) {
+                this.reservacionData.descripcion = salaSeleccionada.description;
+                this.reservacionData.capacidad = salaSeleccionada.capacity;
+            } else {
+                this.reservacionData.descripcion = '';
+                this.reservacionData.capacidad = null;
+            }
         }
     },
     watch: {
         date(newDate) {
             this.reservacionData.fecha = newDate;
         },
+        'reservacionData.nameSala': 'actualizarHorariosDisponibles',
+        'reservacionData.fecha': 'actualizarHorariosDisponibles'
     },
+    mounted() {
+        this.obtenerSalas();
+    }
 };
 </script>
 
@@ -112,13 +175,11 @@ export default {
                 <div class="modal-body">
                     <form @submit.prevent="guardarReservacion">
                         <div class="mb-3">
-                            <select class="form-select" v-model="reservacionData.nameSala" required>
+                            <select class="form-select" v-model="reservacionData.nameSala" @change="actualizarDescripcionYCapacidad" required>
                                 <option value="" disabled selected>Seleccione una Sala</option>
-                                <option value="CIC Sala 1">CIC Sala 1</option>
-                                <option value="CIC Sala 2">CIC Sala 2</option>
-                                <option value="CIC Sala 3">CIC Sala 3</option>
-                                <option value="CIC Sala 4">CIC Sala 4</option>
-                                <option value="Sala de actos">Sala de Actos</option>
+                                <option v-for="sala in salas" :key="sala.id" :value="sala.name">
+                                    {{ sala.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -131,13 +192,11 @@ export default {
                             <input type="date" class="form-control" readonly :value="date">
                         </div>
                         <div class="mb-3">
-                            <select class="form-select" v-model="reservacionData.hour">
-                                <option value="" disable selected> Seleccione un horario </option>
-                                <option value="1"> 07:00 - 09:00</option>
-                                <option value="2"> 09:00 - 11:00</option>
-                                <option value="3"> 11:00 - 13:00</option>
-                                <option value="4"> 13:00 - 15:00</option>
-                                <option value="5"> 15:00 - 17:00</option>
+                            <select class="form-select" v-model="reservacionData.hour" required>
+                                <option value="" disabled selected>Seleccione un horario</option>
+                                <option v-for="horario in horariosDisponibles" :key="horario.value" :value="horario.value">
+                                    {{ horario.start }} - {{ horario.end }}
+                                </option>
                             </select>
                         </div>
                         <div class="text-center">
