@@ -53,7 +53,7 @@ const logout = async () => {
             <RouterLink to="/VisualizarReservas" class="nav-link active palabras" aria-current="page">Visualizar Reservas</RouterLink>
           </li>
           <li class="nav-item">
-            <RouterLink to="/CrearReservacion" class="nav-link active palabras" aria-current="page">Crear Reservaciones</RouterLink>
+            <RouterLink to="/TusReservaciones" class="nav-link active palabras" aria-current="page">Tus Reservas </RouterLink>
           </li>
         </ul>
         <div class="ms-auto d-flex align-items-center">

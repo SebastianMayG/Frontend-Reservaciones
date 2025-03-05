@@ -55,12 +55,17 @@
   
           if (response.ok) {
             const token = data.token;
-  
             localStorage.setItem('token', token);
+            localStorage.setItem('rol',data.data.role);
   
             this.setAuthHeader(token);
-  
-            this.$router.push('/'); // Redirige a la pagina principal
+            if(localStorage.getItem('rol') == 1){
+              this.$router.push('/VisualizarReservas');
+
+            }else{
+              this.$router.push('/TusReservaciones');
+            }
+//            this.$router.push('/'); // Redirige a la pagina principal
           } else {
             alert(data.message || 'Credenciales incorrectas.');
           }

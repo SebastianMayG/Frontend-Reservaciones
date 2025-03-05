@@ -79,7 +79,8 @@ export default {
         const response = await fetch('http://127.0.0.1:8000/api/reservations', {
           method: "GET",
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
 
@@ -100,7 +101,8 @@ export default {
         const response = await fetch('http://127.0.0.1:8000/api/spaces', {
           method: "GET",
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
 
@@ -121,7 +123,8 @@ export default {
         const response = await fetch('http://127.0.0.1:8000/api/users',{
           method: "GET",
           headers:{
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
         if(!response.ok){
