@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 export default {
     name: 'ModifyEventForm',
     props: {
-        event: Object // Asegúrate de que el prop "event" esté definido
+        event: Object,
     },
     data() {
         return {
@@ -185,6 +185,7 @@ export default {
     },
     mounted() {
         this.obtenerSalas(); // Obtener las salas al montar el componente
+
     },
     watch: {
     event: {

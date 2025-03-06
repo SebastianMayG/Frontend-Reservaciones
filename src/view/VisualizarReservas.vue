@@ -1,135 +1,104 @@
 <script>
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import ModalAdmin from '@/components/ModalAdmin.vue';
+import ModalAdminUpdate from '@/components/ModalAdminUpdate.vue';
 
 export default {
   name: 'VisualizarReservas',
   components: {
-    ModalAdmin 
+    ModalAdmin,
+    ModalAdminUpdate
   },
-  mounted(){
+  data() {
+    return {
+      reservaciones: [],
+      reservacionId: null,
+
+    };
+  },
+  mounted() {
     this.cargarDatos();
   },
   methods: {
     abrirModal() {
       let modal = new bootstrap.Modal(document.getElementById('adminModal'));
       modal.show();
+    }, abrirModalModificar(id) {
+      console.log("ID de la reservación:", id); // Verifica que el ID sea correcto
+      this.reservacionId = id;
+      this.$nextTick(() => {
+        let modal = new bootstrap.Modal(document.getElementById('adminModalUpdate'));
+        modal.show();
+      });
+    },
+    async eliminarReservacion(id) {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        this.reservaciones = this.reservaciones.filter(reserva => reserva.id !== id);
+      } catch (error) {
+        console.error('Error al eliminar la reservación:', error.message);
+      }
     },
     async cargarDatos() {
-    try {
-        const reservaciones = await this.obtenerReservaciones();
-        const salas = await this.obtenerSalas();
-        const maestros = await this.obtenerMaestros();
-
-        let reservacionesObjeto = {};
-        for (let i = 0; i < reservaciones.data.length; i++) {
-
-            let space = salas.data.find(sala => sala.id === reservaciones.data[i].space_id);
-            let maestro = maestros.data.find(maestro => maestro.id === reservaciones.data[i].user_id);
-
-            if (space && maestro) { // Verificar si space y maestro existen
-                reservacionesObjeto[i] = {
-                    id: reservaciones.data[i].id,
-                    name: space.name,
-                    descripcion: space.description,
-                    maestro: maestro.name,
-                    capacidad: space.capacity,
-                    fecha: reservaciones.data[i].date + " | " + reservaciones.data[i].start_time + " - " + reservaciones.data[i].end_time
-                };
-            } else {
-                console.error(`No se encontró sala o maestro para la reservación ${reservaciones.data[i].id}`);
-            }
-        }
-
-        const tablaBody = document.getElementById('tablaBody');
-        const reservacionesArray = Object.values(reservacionesObjeto);
-        for (let i = 0; i < reservacionesArray.length; i++) {
-            let row = document.createElement('tr');
-            row.id = reservacionesArray[i].id;
-            tablaBody.appendChild(row);
-            let cellname = document.createElement('td');
-            let cellDescripcion = document.createElement('td');
-            let cellMaestro = document.createElement('td');
-            let cellCapacidad = document.createElement('td');
-            let cellFecha = document.createElement('td');
-            let cellOpciones = document.createElement('td');
-            row.appendChild(cellname);
-            row.appendChild(cellDescripcion);
-            row.appendChild(cellMaestro);
-            row.appendChild(cellCapacidad);
-            row.appendChild(cellFecha);
-            row.appendChild(cellOpciones);
-            cellname.innerHTML = reservacionesArray[i].name;
-            cellDescripcion.innerHTML = reservacionesArray[i].descripcion;
-            cellMaestro.innerHTML = reservacionesArray[i].maestro;
-            cellCapacidad.innerHTML = reservacionesArray[i].capacidad;
-            cellFecha.innerHTML = reservacionesArray[i].fecha;
-            cellOpciones.innerHTML = '<button class="btn btn-warning mx-2">Modificar</button><button class="btn btn-danger mx-2">Eliminar</button>';
-        }
-    } catch (error) {
-        console.error('Error al cargar los datos:', error.message);
-    }
-},
-    async obtenerReservaciones() {
       try {
-        console.log(JSON.stringify(this.form));
-        const response = await fetch('http://127.0.0.1:8000/api/reservations', {
-          method: "GET",
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
+        const [reservaciones, salas, maestros] = await Promise.all([
+          this.obtenerReservaciones(),
+          this.obtenerSalas(),
+          this.obtenerMaestros()
+        ]);
+
+        this.reservaciones = reservaciones.data.map(reserva => {
+          let space = salas.data.find(sala => sala.id === reserva.space_id) || {};
+          let maestro = maestros.data.find(m => m.id === reserva.user_id) || {};
+          return {
+            id: reserva.id,
+            name: space.name || 'Desconocido',
+            descripcion: space.description || 'Sin descripción',
+            maestro: maestro.name || 'Desconocido',
+            capacidad: space.capacity || 'N/A',
+            fecha: `${reserva.date} | ${reserva.start_time} - ${reserva.end_time}`,
+          };
         });
-
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
       } catch (error) {
-        console.error('Error al obtener reservaciones:', error.message);
+        console.error('Error al cargar los datos:', error.message);
       }
+    },
+    async obtenerReservaciones() {
+      return this.fetchData('http://127.0.0.1:8000/api/reservations');
     },
     async obtenerSalas() {
+      return this.fetchData('http://127.0.0.1:8000/api/spaces');
+    },
+    async obtenerMaestros() {
+      return this.fetchData('http://127.0.0.1:8000/api/users');
+    },
+    async fetchData(url) {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+        const response = await fetch(url, {
           method: "GET",
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
-
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+        return await response.json();
       } catch (error) {
-        console.error('Error al obtener salas:', error.message);
-      }
-    },
-    async obtenerMaestros(){
-      try{
-        const response = await fetch('http://127.0.0.1:8000/api/users',{
-          method: "GET",
-          headers:{
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-        });
-        if(!response.ok){
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
-      }catch(error){
-        console.error('Error al obtener maestros:', error.message);
+        console.error(`Error al obtener datos de ${url}:`, error.message);
+        return { data: [] };
       }
     }
-
   }
 };
 </script>
@@ -140,7 +109,7 @@ export default {
       <button class="btn btn-primary" @click="abrirModal">Crear Reservación</button>
     </div>
     <div class="table-responsive m-4">
-      <table class="table table-dark table-striped table-responsive" id = "tabla">
+      <table class="table table-dark table-striped table-responsive">
         <thead>
           <tr>
             <td>Nombre</td>
@@ -151,14 +120,23 @@ export default {
             <td>Opciones</td>
           </tr>
         </thead>
-        <tbody id = "tablaBody">
-          <tr>
-            <!-- Aquí irán los datos de la reservación -->
+        <tbody>
+          <tr v-for="reserva in reservaciones" :key="reserva.id">
+            <td>{{ reserva.name }}</td>
+            <td>{{ reserva.descripcion }}</td>
+            <td>{{ reserva.maestro }}</td>
+            <td>{{ reserva.capacidad }}</td>
+            <td>{{ reserva.fecha }}</td>
+            <td>
+              <button class="btn btn-warning mx-2" @click="abrirModalModificar(reserva.id)">Modificar</button>
+              <button class="btn btn-danger mx-2" @click="eliminarReservacion(reserva.id)">Eliminar</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
     <ModalAdmin />
+    <ModalAdminUpdate :reservacionId="reservacionId" />
   </div>
 </template>
 

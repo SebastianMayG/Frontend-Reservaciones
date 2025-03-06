@@ -85,7 +85,7 @@ export default {
                     case 2: return 'red';
                     case 3: return 'blue';
                     case 4: return 'purple';
-                    case 5: return 'yellow';
+                    case 5: return 'orange';
                     default: return 'gray';
                 }
             };
