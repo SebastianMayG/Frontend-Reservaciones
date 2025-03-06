@@ -43,11 +43,14 @@ export default {
                 },
                 eventClick: (info) => {
                     this.selectedEvent = info.event;
+                    console.log(this.selectedEvent)
+                    console.log('ID del evento: ', this.selectedEvent._def.publicId);
+                    console.log('Sala del evento: ', this.selectedEvent._def.title);
+                    console.log(this.selectedEvent._instance.range.start, this.selectedEvent._instance.range.end)
                     const modal = new bootstrap.Modal(document.getElementById('modifyModal'));
                     modal.show();
                 },
-                events: [
-                ]
+                events: []
             }
         }
     },
@@ -58,14 +61,12 @@ export default {
         async fetchReservations() {
             try {
                 const reservations = await getReservations();
-                console.log(reservations)
                 this.formatEvents(reservations);
             } catch (error) {
                 console.error('Error fetching reservations:', error);
             }
         },
         formatEvents(reservations) {
-            console.log('Reservaciones recibidas:', reservations);
 
             const getSalaName = (spaceId) => {
                 switch (spaceId) {
@@ -90,14 +91,13 @@ export default {
             };
 
             const formattedEvents = reservations.map(reservation => ({
+                id: reservation.id,
                 title: getSalaName(reservation.space_id),
                 start: `${reservation.date}T${reservation.start_time}`, // Formato ISO 8601
                 end: `${reservation.date}T${reservation.end_time}`,     // Formato ISO 8601
                 backgroundColor: getSalaColor(reservation.space_id), // Color del fondo
                 borderColor: getSalaColor(reservation.space_id)
             }));
-
-            console.log('Eventos formateados:', formattedEvents);
 
             // Asegurar que Vue detecte el cambio
             this.calendarOptions = { 
