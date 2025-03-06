@@ -5,7 +5,7 @@ import ModalAdmin from '@/components/ModalAdmin.vue';
 export default {
   name: 'VisualizarReservas',
   components: {
-    ModalAdmin // Aquí se registra el componente
+    ModalAdmin 
   },
   mounted(){
     this.cargarDatos();
@@ -23,7 +23,6 @@ export default {
 
         let reservacionesObjeto = {};
         for (let i = 0; i < reservaciones.data.length; i++) {
-            console.log("reservacion: " + i, reservaciones.data[i]);
 
             let space = salas.data.find(sala => sala.id === reservaciones.data[i].space_id);
             let maestro = maestros.data.find(maestro => maestro.id === reservaciones.data[i].user_id);
@@ -37,7 +36,6 @@ export default {
                     capacidad: space.capacity,
                     fecha: reservaciones.data[i].date + " | " + reservaciones.data[i].start_time + " - " + reservaciones.data[i].end_time
                 };
-                console.log("reservacionesArray: ", reservacionesObjeto);
             } else {
                 console.error(`No se encontró sala o maestro para la reservación ${reservaciones.data[i].id}`);
             }
@@ -46,7 +44,6 @@ export default {
         const tablaBody = document.getElementById('tablaBody');
         const reservacionesArray = Object.values(reservacionesObjeto);
         for (let i = 0; i < reservacionesArray.length; i++) {
-            console.log("primer for");
             let row = document.createElement('tr');
             row.id = reservacionesArray[i].id;
             tablaBody.appendChild(row);
@@ -89,7 +86,6 @@ export default {
         }
 
         const data = await response.json();
-        console.log('Reservaciones:', data);
         return data;
       } catch (error) {
         console.error('Error al obtener reservaciones:', error.message);
@@ -97,7 +93,6 @@ export default {
     },
     async obtenerSalas() {
       try {
-        console.log(JSON.stringify(this.form));
         const response = await fetch('http://127.0.0.1:8000/api/spaces', {
           method: "GET",
           headers: {
@@ -111,7 +106,6 @@ export default {
         }
 
         const data = await response.json();
-        console.log('salas:', data);
         return data;
       } catch (error) {
         console.error('Error al obtener salas:', error.message);
@@ -119,7 +113,6 @@ export default {
     },
     async obtenerMaestros(){
       try{
-        console.log(JSON.stringify(this.form));
         const response = await fetch('http://127.0.0.1:8000/api/users',{
           method: "GET",
           headers:{
@@ -131,7 +124,6 @@ export default {
           throw new Error(`Error HTTP: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Maestros:', data);
         return data;
       }catch(error){
         console.error('Error al obtener maestros:', error.message);
@@ -140,16 +132,14 @@ export default {
 
   }
 };
-
-
 </script>
 
 <template>
   <div>
-    <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-end mb-3 m-4">
       <button class="btn btn-primary" @click="abrirModal">Crear Reservación</button>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive m-4">
       <table class="table table-dark table-striped table-responsive" id = "tabla">
         <thead>
           <tr>
@@ -163,15 +153,6 @@ export default {
         </thead>
         <tbody id = "tablaBody">
           <tr>
-            <td>CIC Sala 1</td>
-            <td>Sala de computo</td>
-            <td>Albus Dumbledore</td>
-            <td>40 alumnos</td>
-            <td>18/02/2025 | 07:00 - 09:00</td>
-            <td>
-              <button class="btn btn-warning mx-2">Modificar</button>
-              <button class="btn btn-danger mx-2">Eliminar</button>
-            </td>
             <!-- Aquí irán los datos de la reservación -->
           </tr>
         </tbody>
