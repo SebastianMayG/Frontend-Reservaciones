@@ -3,31 +3,40 @@
         <div class="d-flex justify-content-center">
             <form class="shadow-backgrd border-r p-4 form-main" @submit.prevent="registerUser">
                 <div class="row-6">
-                    <div class="col-12">
-                        <h1>Registrate en MicroReservas</h1>
+                    <div class="col-12 mb-4">
+                        <h1>Registrate en ClassBooker</h1>
                     </div>
                     <div class="col-12 mb-3 d-flex">
                         <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png"
                             class="icon m-2 border-r ">
-                        <input type="text" class="form-control" placeholder="Nombre(s)" v-model="form.name" required>
+                        <FloatLabel variant="in" class="w-100">
+                            <InputText id="name" v-model="form.name" class="w-100" required />
+                            <label for="name">Name</label>
+                        </FloatLabel>
                     </div>
                     <div class="col-12 mb-3 d-flex">
                         <img src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png"
                             class="icon m-2 border-r ">
-                        <input type="text" class="form-control" placeholder="Apellidos" v-model="form.last_name"
-                            required>
+                        <FloatLabel variant="in" class="w-100">
+                            <InputText id="last_name" v-model="form.last_name" class="w-100" required />
+                            <label for="last_name">Last Name</label>
+                        </FloatLabel>
                     </div>
                     <div class="mb-3 d-flex">
                         <img src="https://icons.veryicon.com/png/o/education-technology/power-customer-label/email-108.png"
                             class="icon m-2">
-                        <input type="email" class="form-control" placeholder="Example@example.com" v-model="form.email"
-                            required>
+                        <FloatLabel variant="in" class="w-100">
+                            <InputText type="email" id="email" v-model="form.email" class="w-100" required />
+                            <label for="email">Email</label>
+                        </FloatLabel>
                     </div>
                     <div class="mb-3 d-flex">
                         <img src="https://icons.veryicon.com/png/o/application/a-group-of-common-linear-icon/password-17.png"
                             class="icon m-2">
-                        <input type="password" class="form-control" placeholder="Contraseña" v-model="form.password"
-                            required>
+                            <FloatLabel variant="in" class="w-100">
+                            <InputText type="password" id="password" v-model="form.password" class="w-100" required />
+                            <label for="password">Password</label>
+                        </FloatLabel>
                     </div>
                     <div class="mb-3 d-flex flex-column">
                         <button class="btn btn-success" type="submit">Registrate</button>
@@ -40,14 +49,21 @@
 </template>
 
 <script>
+import FloatLabel from 'primevue/floatlabel'; // Importa FloatLabel
+import InputText from 'primevue/inputtext'; // Importa InputText
+
 export default {
+    components: {
+        FloatLabel,
+        InputText,
+    },
     data() {
         return {
             form: {
-                name: 'Luis A',
-                last_name: 'Pollo',
-                email: 'al00001@uacam.mx',
-                password: 'laravel'
+                name: '',
+                last_name: '',
+                email: '',
+                password: ''
             }
         };
     },
@@ -72,7 +88,7 @@ export default {
                         last_name: this.form.last_name,
                         email: this.form.email,
                         password: this.form.password,
-                        role:2
+                        role: 2
                     }),
                 });
 
@@ -94,6 +110,7 @@ export default {
                     //            this.$router.push('/'); // Redirige a la pagina principal
                 } else {
                     alert(data.message || 'Credenciales incorrectas.');
+                    console.log(data.errors);
                 }
             } catch (error) {
                 console.error('Error al registarte:', error);

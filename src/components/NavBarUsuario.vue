@@ -5,7 +5,7 @@ import { RouterLink } from 'vue-router';
 <template>
 <nav class="navbar navbar-expand-lg margen-bottom" style="background-color: #265A9C;">
   <div class="container-fluid" >
-    <a class="navbar-brand palabras" href="/">MicroReservas</a>
+    <a class="navbar-brand palabras">ClassBooker</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
