@@ -12,7 +12,9 @@ export default {
   },
   data() {
     return {
-      reservaciones: []
+      reservaciones: [],
+      reservacionId: null,
+
     };
   },
   mounted() {
@@ -22,10 +24,13 @@ export default {
     abrirModal() {
       let modal = new bootstrap.Modal(document.getElementById('adminModal'));
       modal.show();
-    },
-    abrirModalModificar() {
-      let modal = new bootstrap.Modal(document.getElementById('adminModalUpdate'));
-      modal.show();
+    }, abrirModalModificar(id) {
+      console.log("ID de la reservación:", id); // Verifica que el ID sea correcto
+      this.reservacionId = id;
+      this.$nextTick(() => {
+        let modal = new bootstrap.Modal(document.getElementById('adminModalUpdate'));
+        modal.show();
+      });
     },
     async eliminarReservacion(id) {
       try {
@@ -62,7 +67,7 @@ export default {
             descripcion: space.description || 'Sin descripción',
             maestro: maestro.name || 'Desconocido',
             capacidad: space.capacity || 'N/A',
-            fecha: `${reserva.date} | ${reserva.start_time} - ${reserva.end_time}`
+            fecha: `${reserva.date} | ${reserva.start_time} - ${reserva.end_time}`,
           };
         });
       } catch (error) {
@@ -123,7 +128,7 @@ export default {
             <td>{{ reserva.capacidad }}</td>
             <td>{{ reserva.fecha }}</td>
             <td>
-              <button class="btn btn-warning mx-2" @click="abrirModalModificar(reserva)">Modificar</button>
+              <button class="btn btn-warning mx-2" @click="abrirModalModificar(reserva.id)">Modificar</button>
               <button class="btn btn-danger mx-2" @click="eliminarReservacion(reserva.id)">Eliminar</button>
             </td>
           </tr>
@@ -131,7 +136,7 @@ export default {
       </table>
     </div>
     <ModalAdmin />
-    <ModalAdminUpdate/>
+    <ModalAdminUpdate :reservacionId="reservacionId" />
   </div>
 </template>
 
