@@ -1,6 +1,6 @@
 <script>
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
+//import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import { crearReservacion } from '@/services/reservacionService';
 
 export default {
@@ -57,9 +57,8 @@ export default {
                     end_time: end_time,
                     user_id: parseInt(localStorage.getItem('id'))
                 };
-                await crearReservacion(reservacion);
-                const modal = bootstrap.Modal.getInstance(document.getElementById('reservacionModal'));
-                modal.hide();
+                const reservacionCreada = await crearReservacion(reservacion);
+                console.log(reservacionCreada)
                 window.location.reload();
             } catch (error) {
                 console.error('Error al guardar la reservación:', error);
