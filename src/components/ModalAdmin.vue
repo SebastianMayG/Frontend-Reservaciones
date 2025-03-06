@@ -1,15 +1,196 @@
 <script>
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
+import { crearReservacion } from '@/services/reservacionService';
 
 export default {
     name: 'CrearReservaciones',
     props: {
-        date: String
+        //date: String
     },
     data() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
         return {
-            reservarConMaestro: false,
+            reservacionData: {
+                nameSala: '',
+                descripcion: '',
+                capacidad: null,
+                fecha: formattedDate,
+                hour: '',
+            },
+            horariosDisponibles: [],
+            horariosDeSala: [],
+            todasLasReservaciones: [],
+            salas: [],
+            maestros: [],
+            date: formattedDate, // Inicializa 'date' con la fecha actual
         };
+    },
+    methods: {
+        async obtenerSalas() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                this.salas = data.data;
+            } catch (error) {
+                console.error('Error al obtener las salas:', error.message);
+            }
+        },
+        async guardarReservacion() {
+            try {
+                const select = document.getElementById('horarioSelect');
+                const textoSeleccionado = select.options[select.selectedIndex].text;
+                const [start_time, end_time] = textoSeleccionado.split(' - ');
+                console.log(start_time, end_time);
+
+                const profesorId = document.getElementById('nombreDelMaestro').value;
+
+                const reservacion = {
+                    space_id: this.getSalaId(this.reservacionData.nameSala),
+                    date: this.reservacionData.fecha,
+                    start_time: start_time,
+                    end_time: end_time,
+                    user_id: parseInt(profesorId)
+                };
+
+                await crearReservacion(reservacion);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('adminModal'));
+                modal.hide();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al guardar la reservación:', error);
+            }
+        },
+        async obtenerReservacionesExistente(salaId, fecha) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.data;
+            } catch (error) {
+                console.error('Error al obtener reservaciones:', error.message);
+                return [];
+            }
+        },
+        async obtenerHorariosSala(salaId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/schedules/space/${salaId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.data; // Retorna el horario de una sala en especifico
+            } catch (error) {
+                console.error('Error al obtener reservaciones:', error.message);
+                return [];
+            }
+        },
+        async actualizarHorariosDisponibles() {
+            if (this.reservacionData.nameSala && this.reservacionData.fecha) {
+                const salaId = this.getSalaId(this.reservacionData.nameSala);
+                this.todasLasReservaciones = await this.obtenerReservacionesExistente(salaId, this.reservacionData.fecha);
+                this.horariosDeSala = await this.obtenerHorariosSala(salaId);
+
+                // Reemplazar el array fijo con los horarios obtenidos del método
+                const todosLosHorarios = this.horariosDeSala.map(horario => ({
+                    value: horario.id?.toString() || '',
+                    start: horario.start_time,
+                    end: horario.end_time
+                }));
+
+                // Filtrar horarios disponibles
+                this.horariosDisponibles = todosLosHorarios.filter(horario => {
+                    return !this.todasLasReservaciones.some(reserva => {
+                        return reserva.start_time === horario.start && reserva.end_time === horario.end;
+                    });
+                });
+            }
+        },
+        getSalaId(salaName) {
+            const sala = this.salas.find(sala => sala.name === salaName);
+            return sala ? sala.id : null;
+        },
+        actualizarDescripcionYCapacidad() {
+            const salaSeleccionada = this.salas.find(sala => sala.name === this.reservacionData.nameSala);
+            if (salaSeleccionada) {
+                this.reservacionData.descripcion = salaSeleccionada.description;
+                this.reservacionData.capacidad = salaSeleccionada.capacity;
+                this.actualizarHorariosDisponibles();
+            } else {
+                this.reservacionData.descripcion = '';
+                this.reservacionData.capacidad = null;
+            }
+        },
+        async obtenerMaestros() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/users', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data && data.data) {
+                    // Filtrar usuarios con role 2 (maestros)
+                    this.maestros = data.data.filter(user => user.role === 2);
+                } else {
+                    this.maestros = []; // Asegurar que maestros sea un array vacío si no hay datos
+                }
+            } catch (error) {
+                console.error('Error al obtener los maestros:', error.message);
+            }
+        }
+    },
+    watch: {
+        date(newDate) {
+            this.reservacionData.fecha = newDate;
+        },
+        'reservacionData.nameSala': 'actualizarHorariosDisponibles',
+        'reservacionData.fecha': 'actualizarHorariosDisponibles'
+    },
+    mounted() {
+        this.obtenerSalas();
+        this.obtenerMaestros();
     }
 };
 </script>
@@ -24,48 +205,42 @@ export default {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="crear_reservacion" method="post">
+                    <form @submit.prevent="guardarReservacion">
                         <div class="mb-3">
-                            <select class="form-select" name="nameSala" id="nameSala" required>
+                            <select class="form-select" v-model="reservacionData.nameSala"
+                                @change="actualizarDescripcionYCapacidad" required>
                                 <option value="" disabled selected>Seleccione una Sala</option>
-                                <option value="CIC Sala 1">CIC Sala 1</option>
-                                <option value="CIC Sala 2">CIC Sala 2</option>
-                                <option value="CIC Sala 3">CIC Sala 3</option>
-                                <option value="CIC Sala 4">CIC Sala 4</option>
-                                <option value="CIC Sala de actos">Sala de actos</option>
+                                <option v-for="sala in salas" :key="sala.id" :value="sala.name">
+                                    {{ sala.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="descripcion" name="descripcion" placeholder="Descripción" disabled>
+                            <input type="text" class="form-control" v-model="reservacionData.descripcion"
+                                placeholder="Descripción" disabled>
                         </div>
                         <div class="mb-3">
-                            <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad" disabled>
+                            <input type="number" class="form-control" v-model="reservacionData.capacidad"
+                                placeholder="Capacidad" disabled>
                         </div>
                         <div class="mb-3">
-                            <input type="date" id="fecha" class="form-control" name="fecha" placeholder="Fecha" required :value="date">
+                            <input type="date" id="fecha" class="form-control" name="fecha" placeholder="Fecha" required v-model="date">
                         </div>
                         <div class="mb-3">
-                            <select class="form-select" name="hour" id="hour-input">
-                                <option value="" disable selected> Seleccione un horario </option>
-                                <option value="1"> 07:00 - 09:00</option>
-                                <option value="2"> 09:00 - 11:00</option>
-                                <option value="3"> 11:00 - 13:00</option>
-                                <option value="4"> 13:00 - 15:00</option>
-                                <option value="5"> 15:00 - 17:00</option>  
+                            <select id= "horarioSelect" class="form-select" v-model="reservacionData.hour" required>
+                                <option value="" disabled selected>Seleccione un horario</option>
+                                <option v-for="horario in horariosDisponibles" :key="horario.value"
+                                    :value="horario.value">
+                                    {{ horario.start }} - {{ horario.end }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <input class="form-check-input" type="checkbox" id="reservarConMaestro" v-model="reservarConMaestro">
-                            <label class="form-check-label" for="reservarConMaestro">
-                                Reservar con maestro
-                            </label>
-                        </div>
-                        <div class="mb-3" v-if="reservarConMaestro">
                             <select class="form-select" name="nombreDelMaestro" id="nombreDelMaestro" required>
                                 <option value="" disabled selected>Nombre del profesor</option>
-                                <option value="Maestro 1">Maestro 1</option>
-                                <option value="Maestro 2">Maestro 2</option>
-                                <option value="Maestro 3">Maestro 3</option>
+                                <option v-for="maestro in maestros" :key="maestro.id" :value="maestro.id">
+                                    {{ maestro.name }} {{ maestro.last_name }}
+                                </option>
                             </select>
                         </div>
                         <div class="text-center">
