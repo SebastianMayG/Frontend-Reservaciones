@@ -22,7 +22,7 @@ export async function actualizarReservacion(id, reservacionData) {
         console.log('Actualización realizada:', data);
         return data;
     } catch (error) {
-        console.error('Error al actualizar la reservación:', error);
+        console.error('Error al actualizar la reservación:', error.errors || error.message);
         throw error;
     }
 }

@@ -4,7 +4,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 export default {
     name: 'ModifyEventForm',
     props: {
-        event: Object
+        event: Object,
+        date: String
     },
     data() {
         return {
@@ -20,39 +21,54 @@ export default {
             }
             return null;
         },
+    
+    },
+    methods: {
+        updateSelectedHour() {
+            const start_time1 = this.startTime();
+            const end_time1 = this.endTime();
+            console.log("start_time:", start_time1);
+            console.log("end_time:", end_time1);
+            if (this.event && this.event.start) {
+                const hours = this.event.start.getHours().toString().padStart(2, '0');
+                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
+                const time_start= `${hours}:${minutes}`;
+
+                if (time_start >= '07:00' && time_start < '09:00') {
+                    this.selectedHour = '1';
+                } else if (time_start >= '09:00' && time_start < '11:00') {
+                    this.selectedHour = '2';
+                } else if (time_start >= '11:00' && time_start < '13:00') {
+                    this.selectedHour = '3';
+                } else if (time_start >= '13:00' && time_start < '15:00') {
+                    this.selectedHour = '4';
+                } else if (time_start >= '15:00' && time_start < '17:00') {
+                    this.selectedHour = '5';
+                }
+            }
+        },
         startTime() {
             if (this.event && this.event.start) {
                 const hours = this.event.start.getHours().toString().padStart(2, '0');
                 const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
                 return `${hours}:${minutes}`;
+
             }
             return null;
         },
-    },
-    methods: {
-        updateSelectedHour() {
-            if (this.event && this.event.start) {
-                const hours = this.event.start.getHours().toString().padStart(2, '0');
-                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
-                const time = `${hours}:${minutes}`;
-
-                if (time >= '07:00' && time < '09:00') {
-                    this.selectedHour = '1';
-                } else if (time >= '09:00' && time < '11:00') {
-                    this.selectedHour = '2';
-                } else if (time >= '11:00' && time < '13:00') {
-                    this.selectedHour = '3';
-                } else if (time >= '13:00' && time < '15:00') {
-                    this.selectedHour = '4';
-                } else if (time >= '15:00' && time < '17:00') {
-                    this.selectedHour = '5';
-                }
+        endTime() {
+            if (this.event && this.event.end) {
+                const hours = this.event.end.getHours().toString().padStart(2, '0');
+                const minutes = this.event.end.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
             }
+            return null;
         }
     },
     mounted() {
         console.log("this.event:", this.event);
         console.log("this.event.start:", this.event?.start);
+        console.log("this.event.end:", this.event?.end);
         this.updateSelectedHour();
         if (this.event && this.event.title) {
             this.selectedTitle = this.event.title;
