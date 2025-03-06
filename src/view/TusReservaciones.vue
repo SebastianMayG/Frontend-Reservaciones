@@ -15,7 +15,7 @@ export default {
         FullCalendar,
         EventForm,
         NavBarUsuario,
-        ModifyEventForm
+        ModifyEventForm,
     },
     data() {
         return {
@@ -115,6 +115,7 @@ export default {
         <FullCalendar :options="calendarOptions" />
         <EventForm :date="date" />
         <ModifyEventForm :event="selectedEvent" />
+        <UpdateModal :event="selectedEvent" />
     </div>
 </template>
 
