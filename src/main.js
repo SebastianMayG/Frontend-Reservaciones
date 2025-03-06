@@ -1,8 +1,18 @@
-import 'bootstrap/dist/css/bootstrap.min.css'
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router/index.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'primeicons/primeicons.css'; // Iconos de PrimeVue
 
-const app = createApp(App)  // Crea la app
-app.use(router)             // Usa el enrutador
-app.mount('#app')           // Monta la app una vez
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router/index.js';
+
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura';
+
+const app = createApp(App);
+app.use(router);
+app.use(PrimeVue,{
+    theme:{
+        preset:Aura,
+    },
+});
+app.mount('#app');
