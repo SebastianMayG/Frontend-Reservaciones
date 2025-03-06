@@ -10,7 +10,6 @@ export default {
     },
     data() {
         return {
-            reservarConMaestro: false,
             reservacionData: {
                 nameSala: '',
                 descripcion: '',
@@ -133,38 +132,6 @@ export default {
             const sala = this.salas.find(sala => sala.name === salaName);
             return sala ? sala.id : null;
         },
-        // getHoraInicio(hour) {
-        //     switch (hour) {
-        //         case '1':
-        //             return '07:00';
-        //         case '2':
-        //             return '09:00';
-        //         case '3':
-        //             return '11:00';
-        //         case '4':
-        //             return '13:00';
-        //         case '5':
-        //             return '15:00';
-        //         default:
-        //             return null;
-        //     }
-        // },
-        // getHoraFin(hour) {
-        //     switch (hour) {
-        //         case '1':
-        //             return '09:00';
-        //         case '2':
-        //             return '11:00';
-        //         case '3':
-        //             return '13:00';
-        //         case '4':
-        //             return '15:00';
-        //         case '5':
-        //             return '17:00';
-        //         default:
-        //             return null;
-        //     }
-        // },
         actualizarDescripcionYCapacidad() {
             const salaSeleccionada = this.salas.find(sala => sala.name === this.reservacionData.nameSala);
             if (salaSeleccionada) {
@@ -188,9 +155,6 @@ export default {
     }
 };
 </script>
-
-
-
 
 <template>
     <div class="modal fade" id="reservacionModal" tabindex="-1" aria-labelledby="reservacionModalLabel"
