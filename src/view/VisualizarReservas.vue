@@ -3,12 +3,17 @@ import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ModalAdmin from '@/components/ModalAdmin.vue';
 import ModalAdminUpdate from '@/components/ModalAdminUpdate.vue';
-
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
 export default {
   name: 'VisualizarReservas',
   components: {
     ModalAdmin,
-    ModalAdminUpdate
+    ModalAdminUpdate,
+    DataTable,
+    Column,
+    Button
   },
   data() {
     return {
@@ -113,37 +118,30 @@ export default {
 
 <template>
   <div>
+    <!-- Botón para crear reservación -->
     <div class="d-flex justify-content-end mb-3 m-4">
       <button class="btn btn-primary" @click="abrirModal">Crear Reservación</button>
     </div>
-    <div class="table-responsive m-4">
-      <table class="table table-dark table-striped table-responsive">
-        <thead>
-          <tr>
-            <td>Nombre</td>
-            <td>Descripción</td>
-            <td>Maestro</td>
-            <td>Capacidad</td>
-            <td>Fecha y hora</td>
-            <td>Opciones</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="reserva in reservaciones" :key="reserva.id">
-            <td>{{ reserva.name }}</td>
-            <td>{{ reserva.descripcion }}</td>
-            <td>{{ reserva.maestro }}</td>
-            <td>{{ reserva.capacidad }}</td>
-            <td>{{ reserva.fecha }}</td>
-            <td>
-              <button class="btn btn-warning mx-2" @click="abrirModalModificar(reserva.id)">Modificar</button>
-              <button class="btn btn-danger mx-2" @click="eliminarReservacion(reserva.id)">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Contenedor de la tabla con altura fija -->
+    <div class="px-5 table-container">
+      <DataTable :value="reservaciones" tableStyle="min-width: 50rem">
+        <Column field="name" header="Nombre"></Column>
+        <Column field="descripcion" header="Descripción"></Column>
+        <Column field="maestro" header="Maestro"></Column>
+        <Column field="capacidad" header="Capacidad"></Column>
+        <Column field="fecha" header="Fecha y hora"></Column>
+        <Column header="Opciones">
+          <template #body="slotProps">
+            <Button label="Editar" icon="pi pi-pencil" severity="warn" @click="abrirModalModificar(slotProps.data.id)" class="me-2"/>
+            <Button label="Eliminar" icon="pi pi-trash" severity="danger" @click="eliminarReservacion(slotProps.data.id)"/>
+          </template>
+        </Column>
+      </DataTable>
     </div>
-    <div class="d-flex justify-content-center">
+
+    <!-- Botones de paginación -->
+    <div class="d-flex justify-content-center pagination-buttons">
       <button class="btn btn-secondary mx-2" 
               :disabled="pagination.current_page === 1" 
               @click="cargarDatos(pagination.current_page - 1)">
@@ -158,9 +156,25 @@ export default {
         Siguiente
       </button>
     </div>
+
+    <!-- Modal para crear y modificar reservaciones -->
     <ModalAdmin />
     <ModalAdminUpdate :reservacionId="reservacionId" />
   </div>
 </template>
 
-<style></style>
+<style scoped>
+  .table-container {
+    height: 50rem; /* Ajusta esta altura según tus necesidades */
+    overflow-y: auto; /* Añade un scroll vertical si el contenido es demasiado grande */
+    margin-bottom: 1rem; /* Espacio entre la tabla y los botones de paginación */
+  }
+
+  .pagination-buttons {
+    position: sticky;
+    bottom: 0;
+    background-color: white; /* Fondo blanco para que los botones no se mezclen con el contenido */
+    padding: 10px 0; /* Espaciado para los botones */
+    z-index: 1; /* Asegura que los botones estén por encima del contenido */
+  }
+</style>
