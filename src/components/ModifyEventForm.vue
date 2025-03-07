@@ -102,6 +102,14 @@ export default {
         },
         async updateReservacion() {
             try {
+
+                const hoy = new Date().toISOString().split('T')[0];
+                console.log(hoy)
+
+                if (this.reservacionData.fecha <= hoy) {
+                    alert("No puede modificar una reservacion en menos de 24 horas a esta");
+                    return; // Detiene la ejecución del método
+                }
                 const horarioSeleccionado = this.reservacionData.hour;
                 const start_time = horarioSeleccionado.start
                 const end_time = horarioSeleccionado.end;
