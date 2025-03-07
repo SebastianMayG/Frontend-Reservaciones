@@ -1,56 +1,86 @@
 <script>
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { actualizarReservacion } from '@/services/UpdateService';
 
 export default {
     name: 'ModifyEventForm',
     props: {
         event: Object,
+        date: String,
     },
     data() {
         return {
-            salas: [], // Lista de salas
-            fechaReservacion: '',
-            horaReservacion: '',
-            salaSeleccionada: '',
-            horariosDisponibles: [
-                // Añadir horarios disponibles, si los tienes
-            ]
+            reservarConMaestro: false,
+            selectedHour: null,
+            selectedTitle: null,
+            reservacionId: null,
+            reservacionData: {
+                nameSala: "",
+                descripcion: '',
+                capacidad: null,
+                fecha: this.date,
+                hour: '',
+            },
+            horariosDisponibles: [], // Array para almacenar los horarios disponibles
+            horariosDeSala: [], // Array para almacenar los horarios de una sala en especifico
+            todasLasReservaciones: [], // Array para almacenar las reservaciones existentes
+            salas: [] // Array para almacenar las salas obtenidas del backend
         };
     },
-    methods: {
-        async actualizarReservacion() {
-            try {
-                const id = this.event._def.publicId; // Obtener el ID de la reservación
-                console.log("ID de la reservación:", id); // Verifica que el ID se esté obteniendo correctamente
-                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
-                    method: "PATCH",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        date: this.fechaReservacion,
-                        start_time: this.horaReservacion,
-                        space_id: this.salaSeleccionada
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("Reservación actualizada:", data);
-
-                // Opcional: Mostrar alerta de éxito
-                alert("Reservación actualizada con éxito");
-
-                // Recargar la página o actualizar la lista de reservaciones
-                window.location.reload();
-            } catch (error) {
-                console.error('Error al actualizar la reservación:', error.message);
-                alert("Error al actualizar la reservación");
+    computed: {
+        startDate() {
+            if (this.event && this.event.start) {
+                return this.event.start.toISOString().split('T')[0];
             }
+            return null;
+        },
+
+    },
+    methods: {
+        showId() {
+            console.log("ID de la reservación:", this.reservacionId);
+        },
+        updateSelectedHour() {
+            const start_time1 = this.startTime();
+            const end_time1 = this.endTime();
+            console.log("start_time:", start_time1);
+            console.log("end_time:", end_time1);
+
+            if (this.event && this.event.start) {
+                const hours = this.event.start.getHours().toString().padStart(2, '0');
+                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
+                const time_start = `${hours}:${minutes}`;
+
+                if (time_start >= '07:00' && time_start < '09:00') {
+                    this.selectedHour = '1';
+                } else if (time_start >= '09:00' && time_start < '11:00') {
+                    this.selectedHour = '2';
+                } else if (time_start >= '11:00' && time_start < '13:00') {
+                    this.selectedHour = '3';
+                } else if (time_start >= '13:00' && time_start < '15:00') {
+                    this.selectedHour = '4';
+                } else if (time_start >= '15:00' && time_start < '17:00') {
+                    this.selectedHour = '5';
+                }
+            }
+            this.showId();
+        },
+        startTime() {
+            if (this.event && this.event.start) {
+                const hours = this.event.start.getHours().toString().padStart(2, '0');
+                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+
+            }
+            return null;
+        },
+        endTime() {
+            if (this.event && this.event.end) {
+                const hours = this.event.end.getHours().toString().padStart(2, '0');
+                const minutes = this.event.end.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            }
+            return null;
         },
         async obtenerSalas() {
             try {
@@ -68,9 +98,126 @@ export default {
 
                 const data = await response.json();
                 this.salas = data.data; // Asumiendo que la respuesta es un array de salas
-                console.log("Salas obtenidas:", this.salas); // Verifica las salas obtenidas
             } catch (error) {
                 console.error('Error al obtener las salas:', error.message);
+            }
+        },
+        async updateReservacion() {
+            try {
+                const horarioSeleccionado = this.reservacionData.hour;
+                const start_time = horarioSeleccionado.start
+                const end_time = horarioSeleccionado.end;
+
+                const reservacion = {
+                    space_id: this.getSalaId(this.reservacionData.nameSala),
+                    user_id: parseInt(localStorage.getItem('id')),
+                    date: this.reservacionData.fecha,
+                    start_time: start_time,
+                    end_time: end_time,
+                };
+                console.log("reservacion enviando", reservacion);
+
+                await actualizarReservacion(this.reservacionId, reservacion);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modifyModal'));
+                modal.hide();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al guardar la reservación:', error);
+            }
+        },
+        async obtenerReservacionesExistente(salaId, fecha) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.data; // Retorna las reservaciones existentes
+            } catch (error) {
+                console.error('Error al obtener reservaciones:', error.message);
+                return [];
+            }
+        },
+        async eliminarReservacion(id) {
+            if (!id) {
+                console.error("Error: El ID de la reservación es undefined");
+                return;
+            }
+            // Mostrar alerta de confirmación
+            const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
+            if (!confirmacion) {
+                return; // Si el usuario cancela, no se ejecuta la eliminación
+            }
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Reservación eliminada:", data);
+                // Opcional: Mostrar alerta de éxito
+                alert("Reservación eliminada con éxito");
+                // Recargar la página o actualizar la lista de reservaciones
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al eliminar la reservación:', error.message);
+                alert("Error al eliminar la reservación");
+            }
+        },
+        async obtenerHorariosSala(salaId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/schedules/space/${salaId}`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.data; // Retorna el horario de una sala en especifico
+            } catch (error) {
+                console.error('Error al obtener reservaciones:', error.message);
+                return [];
+            }
+        },
+        async actualizarHorariosDisponibles() {
+            if (this.reservacionData.nameSala && this.reservacionData.fecha) {
+                const salaId = this.getSalaId(this.reservacionData.nameSala);
+                this.todasLasReservaciones = await this.obtenerReservacionesExistente(salaId, this.reservacionData.fecha);
+                this.horariosDeSala = await this.obtenerHorariosSala(salaId);
+
+                // Reemplazar el array fijo con los horarios obtenidos del método
+                const todosLosHorarios = this.horariosDeSala.map(horario => ({
+                    value: horario.id?.toString() || '',
+                    start: horario.start_time,
+                    end: horario.end_time
+                }));
+
+                // Filtrar horarios disponibles
+                this.horariosDisponibles = todosLosHorarios.filter(horario => {
+                    return !this.todasLasReservaciones.some(reserva => {
+                        return reserva.start_time === horario.start && reserva.end_time === horario.end;
+                    });
+                });
             }
         },
         async obtenerReservacion(id) {
@@ -91,6 +238,7 @@ export default {
 
                 // Asignar los valores a las propiedades del componente
                 this.fechaReservacion = data.data.date || '';
+                this.reservacionData.fecha = data.data.date;
                 this.horaReservacion = data.data.start_time || '';
                 this.salaSeleccionada = data.data.space_id || '';
 
@@ -100,162 +248,121 @@ export default {
                 console.log('Error al obtener la reservación:', error.message);
             }
         },
-        async eliminarReservacion(id) {
-            if (!id) {
-                console.error("Error: El ID de la reservación es undefined");
-                return;
-            }
-
-            // Mostrar alerta de confirmación
-            const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
-            if (!confirmacion) {
-                return; // Si el usuario cancela, no se ejecuta la eliminación
-            }
-
-            try {
-                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("Reservación eliminada:", data);
-
-                // Opcional: Mostrar alerta de éxito
-                alert("Reservación eliminada con éxito");
-
-                // Recargar la página o actualizar la lista de reservaciones
-                window.location.reload();
-            } catch (error) {
-                console.error('Error al eliminar la reservación:', error.message);
-                alert("Error al eliminar la reservación");
+        getSalaId(salaName) {
+            const sala = this.salas.find(sala => sala.name === salaName);
+            return sala ? sala.id : null;
+        },
+        actualizarDescripcionYCapacidad() {
+            const salaSeleccionada = this.salas.find(sala => sala.name === this.reservacionData.nameSala);
+            if (salaSeleccionada) {
+                this.reservacionData.descripcion = salaSeleccionada.description;
+                this.reservacionData.capacidad = salaSeleccionada.capacity;
+            } else {
+                this.reservacionData.descripcion = '';
+                this.reservacionData.capacidad = null;
             }
         },
-        async obtenerReservacionesExistente(salaId, fecha) {
+        async ejecutarProcesos() {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("prpr", data)
-                return data.data; // Retorna las reservaciones existentes
+                // Ejecutar los métodos en orden
+                await this.obtenerReservacion(this.reservacionId);
+                await this.obtenerSalas();
+                await this.actualizarDescripcionYCapacidad();
+                await this.actualizarHorariosDisponibles();
             } catch (error) {
-                console.error('Error al obtener reservaciones:', error.message);
-                return [];
-            }
-        },
-        async obtenerHorariosSala(salaId) {
-            try {
-                const response = await fetch(`http://127.0.0.1:8000/api/schedules/space/${salaId}`, {
-                    method: "GET",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log(data)
-                console.log(salaId)
-                return data.data; // Retorna el horario de una sala en especifico
-            } catch (error) {
-                console.error('Error al obtener reservaciones:', error.message);
-                return [];
+                console.error(error)
             }
         },
     },
     mounted() {
-        this.obtenerSalas(); // Obtener las salas al montar el componente
+
+        console.log("this.event:", this.event);
+        console.log("this.event.start:", this.event?.start);
+        console.log("this.event.end:", this.event?.end);
+
+        this.updateSelectedHour();
+        if (this.event && this.event.title) {
+            this.selectedTitle = this.event.title;
+        }
+
 
     },
     watch: {
-    event: {
-        immediate: true, // Ejecuta el watcher inmediatamente al montar el componente
-        handler(newEvent) {
-            if (newEvent) {
-                // id de las reservaciones
-                const id = newEvent._def.publicId;
-                const idSala = newEvent._def.title;
+        event: {
+            handler: 'updateSelectedHour',
+            immediate: true
+        },
+        'event.title': {
+            handler(newTitle) {
+                this.selectedTitle = newTitle;
+                console.log(this.selectedTitle)
+                this.reservacionData.nameSala = newTitle;
+            },
+            immediate: true
+        },
+        'event.id': {
+            handler(newId) {
+                this.reservacionId = newId;
+                // this.obtenerReservacion(this.reservacionId);
 
-                let salaId;
+                // this.actualizarDescripcionYCapacidad();
+                // this.actualizarHorariosDisponibles();
+                this.ejecutarProcesos();
 
-                // Asignar un valor único dependiendo de la sala
-                if (idSala === "CIC Sala 1") {
-                    salaId = 1;
-                } else if (idSala === "CIC Sala 2") {
-                    salaId = 2;
-                } else if (idSala === "CIC Sala 3") {
-                    salaId = 3;
-                } else if (idSala === "CIC Sala 4") {
-                    salaId = 4;
-                } else if (idSala === "Sala de Actos") {
-                    salaId = 5;
-                }
-
-                // Llamar a las funciones con el id adecuado
-                this.obtenerReservacion(id);
-                this.obtenerReservacionesExistente(salaId, "2025-03-06");
-                this.obtenerHorariosSala(salaId); // Pasar el ID numérico de la sala
-            }
+                console.log("ID de la reservación desde watch:", this.reservacionId);
+                console.log("nombre de la sala desde el watch ", this.reservacionData.nameSala)
+                console.log("fecha de la sala desde el watch", this.reservacionData.fecha)
+                console.log("horarios disponibles desde el watch", this.horariosDisponibles);
+            },
+            immediate: true
         }
     }
-}
-
 };
 </script>
-
 
 <template>
     <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="reservacionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="reservacionModalLabel">Modificar Reservación</h5>
+                    <h5 class="modal-title" id="reservacionModalLabel">Actualizar Reservación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent="actualizarReservacion">
+                    <form @submit.prevent="updateReservacion">
                         <div class="mb-3">
-                            <select class="form-select" name="nameSala" id="nameSala" v-model="salaSeleccionada" required>
+                            <select class="form-select" v-model="reservacionData.nameSala"
+                                @change="actualizarDescripcionYCapacidad" required>
                                 <option value="" disabled selected>Seleccione una Sala</option>
-                                <option v-for="sala in salas" :key="sala.id" :value="sala.id">
+                                <option v-for="sala in salas" :key="sala.id" :value="sala.name">
                                     {{ sala.name }}
                                 </option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <input type="date" id="fecha" class="form-control" name="fecha" v-model="fechaReservacion" required>
+                            <input type="text" class="form-control" v-model="reservacionData.descripcion"
+                                placeholder="Descripción" disabled>
                         </div>
                         <div class="mb-3">
-                            <select name="hour" id="hour-input" v-model="horaReservacion" required>
-                                <option disabled selected>Seleccione un horario</option>
-                                <option v-for="horario in horariosDisponibles" :key="horario.value" :value="horario.value">
+                            <input type="number" class="form-control" v-model="reservacionData.capacidad"
+                                placeholder="Capacidad" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <input type="date" id="fecha" class="form-control" name="fecha"
+                                v-model="reservacionData.fecha" required>
+                        </div>
+                        <div class="mb-3">
+                            <select id="horarioSelect" class="form-select" v-model="reservacionData.hour" required>
+                                <option value="" disabled selected>Seleccione un horario</option>
+                                <option v-for="(horario, index) in horariosDisponibles" :key="index" :value="horario">
                                     {{ horario.start }} - {{ horario.end }}
                                 </option>
                             </select>
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Modificar</button>
-                            <button type="button" class="btn btn-danger" @click="eliminarReservacion(event._def.publicId)">Eliminar</button>
+                            <button type="submit" class="btn btn-warning m-2">Modificar</button>
+                            <button type="button" class="btn btn-danger"
+                                @click="eliminarReservacion(event._def.publicId)">Eliminar</button>
                         </div>
                     </form>
                 </div>
