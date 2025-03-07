@@ -107,12 +107,6 @@ export default {
                 const horarioSeleccionado = this.reservacionData.hour;
                 const start_time = horarioSeleccionado.start
                 const end_time = horarioSeleccionado.end;
-                //const select = document.getElementById('horarioSelect');
-               // const textoSeleccionado = select.options[select.selectedIndex].text;
-                
-                //const [start_time, end_time] = textoSeleccionado.split(' - ');
-
-                //const profesorId = document.getElementById('nombreDelMaestro').value;
 
                 const reservacion = {
                     space_id: this.getSalaId(this.reservacionData.nameSala),

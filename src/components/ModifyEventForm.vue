@@ -34,7 +34,6 @@ export default {
             }
             return null;
         },
-
     },
     methods: {
         showId() {
@@ -70,7 +69,6 @@ export default {
                 const hours = this.event.start.getHours().toString().padStart(2, '0');
                 const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
                 return `${hours}:${minutes}`;
-
             }
             return null;
         },
@@ -107,7 +105,6 @@ export default {
                 const horarioSeleccionado = this.reservacionData.hour;
                 const start_time = horarioSeleccionado.start
                 const end_time = horarioSeleccionado.end;
-
                 const reservacion = {
                     space_id: this.getSalaId(this.reservacionData.nameSala),
                     user_id: parseInt(localStorage.getItem('id')),
@@ -174,8 +171,7 @@ export default {
                 // Recargar la página o actualizar la lista de reservaciones
                 window.location.reload();
             } catch (error) {
-                console.error('Error al eliminar la reservación:', error.message);
-                alert("Error al eliminar la reservación");
+                console.error('Error al guardar la reservación:', error);
             }
         },
         async obtenerHorariosSala(salaId) {
@@ -321,7 +317,8 @@ export default {
 </script>
 
 <template>
-    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="reservacionModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="reservacionModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
