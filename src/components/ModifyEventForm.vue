@@ -13,7 +13,7 @@ export default {
             reservarConMaestro: false,
             selectedHour: null,
             selectedTitle: null,
-            reservacionId:null,
+            reservacionId: null,
             reservacionData: {
                 nameSala: "",
                 descripcion: '',
@@ -34,7 +34,6 @@ export default {
             }
             return null;
         },
-    
     },
     methods: {
         showId() {
@@ -45,11 +44,11 @@ export default {
             const end_time1 = this.endTime();
             console.log("start_time:", start_time1);
             console.log("end_time:", end_time1);
-            
+
             if (this.event && this.event.start) {
                 const hours = this.event.start.getHours().toString().padStart(2, '0');
                 const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
-                const time_start= `${hours}:${minutes}`;
+                const time_start = `${hours}:${minutes}`;
 
                 if (time_start >= '07:00' && time_start < '09:00') {
                     this.selectedHour = '1';
@@ -70,7 +69,6 @@ export default {
                 const hours = this.event.start.getHours().toString().padStart(2, '0');
                 const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
                 return `${hours}:${minutes}`;
-
             }
             return null;
         },
@@ -107,7 +105,6 @@ export default {
                 const horarioSeleccionado = this.reservacionData.hour;
                 const start_time = horarioSeleccionado.start
                 const end_time = horarioSeleccionado.end;
-
                 const reservacion = {
                     space_id: this.getSalaId(this.reservacionData.nameSala),
                     user_id: parseInt(localStorage.getItem('id')),
@@ -117,7 +114,7 @@ export default {
                 };
                 console.log("reservacion enviando", reservacion);
 
-                await actualizarReservacion(this.reservacionId,reservacion);
+                await actualizarReservacion(this.reservacionId, reservacion);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('modifyModal'));
                 modal.hide();
                 window.location.reload();
@@ -144,6 +141,37 @@ export default {
             } catch (error) {
                 console.error('Error al obtener reservaciones:', error.message);
                 return [];
+            }
+        },
+        async eliminarReservacion(id) {
+            if (!id) {
+                console.error("Error: El ID de la reservación es undefined");
+                return;
+            }
+            // Mostrar alerta de confirmación
+            const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
+            if (!confirmacion) {
+                return; // Si el usuario cancela, no se ejecuta la eliminación
+            }
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Reservación eliminada:", data);
+                // Opcional: Mostrar alerta de éxito
+                alert("Reservación eliminada con éxito");
+                // Recargar la página o actualizar la lista de reservaciones
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al guardar la reservación:', error);
             }
         },
         async obtenerHorariosSala(salaId) {
@@ -243,17 +271,17 @@ export default {
         },
     },
     mounted() {
-        
+
         console.log("this.event:", this.event);
         console.log("this.event.start:", this.event?.start);
         console.log("this.event.end:", this.event?.end);
-        
+
         this.updateSelectedHour();
         if (this.event && this.event.title) {
             this.selectedTitle = this.event.title;
         }
-        
-       
+
+
     },
     watch: {
         event: {
@@ -283,7 +311,7 @@ export default {
                 console.log("horarios disponibles desde el watch", this.horariosDisponibles);
             },
             immediate: true
-        }   
+        }
     }
 };
 </script>
@@ -317,20 +345,21 @@ export default {
                                 placeholder="Capacidad" disabled>
                         </div>
                         <div class="mb-3">
-                            <input type="date" id="fecha" class="form-control" name="fecha" v-model="reservacionData.fecha" required>
+                            <input type="date" id="fecha" class="form-control" name="fecha"
+                                v-model="reservacionData.fecha" required>
                         </div>
                         <div class="mb-3">
                             <select id="horarioSelect" class="form-select" v-model="reservacionData.hour" required>
                                 <option value="" disabled selected>Seleccione un horario</option>
-                                <option v-for="(horario , index) in horariosDisponibles" :key="index"
-                                    :value="horario">
+                                <option v-for="(horario, index) in horariosDisponibles" :key="index" :value="horario">
                                     {{ horario.start }} - {{ horario.end }}
                                 </option>
                             </select>
                         </div>
                         <div class="text-center">
                             <button type="submit" class="btn btn-warning m-2">Modificar</button>
-                            <button type="button" class="btn btn-danger" @click="eliminarReservacion(event._def.publicId)">Eliminar</button>
+                            <button type="button" class="btn btn-danger"
+                                @click="eliminarReservacion(event._def.publicId)">Eliminar</button>
                         </div>
                     </form>
                 </div>

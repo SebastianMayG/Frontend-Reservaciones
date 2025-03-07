@@ -14,7 +14,10 @@ export default {
     return {
       reservaciones: [],
       reservacionId: null,
-
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+      },
     };
   },
   mounted() {
@@ -22,17 +25,22 @@ export default {
   },
   methods: {
     abrirModal() {
-      let modal = new bootstrap.Modal(document.getElementById('adminModal'));
-      modal.show();
-    }, abrirModalModificar(id) {
-      console.log("ID de la reservación:", id); // Verifica que el ID sea correcto
+      new bootstrap.Modal(document.getElementById('adminModal')).show();
+    },
+    abrirModalModificar(id) {
       this.reservacionId = id;
       this.$nextTick(() => {
-        let modal = new bootstrap.Modal(document.getElementById('adminModalUpdate'));
-        modal.show();
+        new bootstrap.Modal(document.getElementById('adminModalUpdate')).show();
       });
     },
     async eliminarReservacion(id) {
+      if (!id) {
+        console.error("Error: El ID de la reservación es undefined");
+        return;
+      }
+      const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
+      if (!confirmacion) return;
+
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
           method: 'DELETE',
@@ -40,25 +48,23 @@ export default {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-
-        this.reservaciones = this.reservaciones.filter(reserva => reserva.id !== id);
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+        alert("Reservación eliminada con éxito");
+        this.cargarDatos(this.pagination.current_page);
       } catch (error) {
         console.error('Error al eliminar la reservación:', error.message);
+        alert("Error al eliminar la reservación");
       }
     },
-    async cargarDatos() {
+    async cargarDatos(page = 1) {
       try {
         const [reservaciones, salas, maestros] = await Promise.all([
-          this.obtenerReservaciones(),
+          this.obtenerReservaciones(page),
           this.obtenerSalas(),
           this.obtenerMaestros()
         ]);
 
-        this.reservaciones = reservaciones.data.map(reserva => {
+        this.reservaciones = reservaciones.data.data.map(reserva => {
           let space = salas.data.find(sala => sala.id === reserva.space_id) || {};
           let maestro = maestros.data.find(m => m.id === reserva.user_id) || {};
           return {
@@ -70,12 +76,14 @@ export default {
             fecha: `${reserva.date} | ${reserva.start_time} - ${reserva.end_time}`,
           };
         });
+        this.pagination = reservaciones.data;
       } catch (error) {
         console.error('Error al cargar los datos:', error.message);
+        alert("Error al cargar los datos. Inténtalo de nuevo más tarde.");
       }
     },
-    async obtenerReservaciones() {
-      return this.fetchData('http://127.0.0.1:8000/api/reservations');
+    async obtenerReservaciones(page) {
+      return this.fetchData(`http://127.0.0.1:8000/api/reservations?page=${page}`);
     },
     async obtenerSalas() {
       return this.fetchData('http://127.0.0.1:8000/api/spaces');
@@ -134,6 +142,21 @@ export default {
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-secondary mx-2" 
+              :disabled="pagination.current_page === 1" 
+              @click="cargarDatos(pagination.current_page - 1)">
+        Anterior
+      </button>
+      
+      <span>Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+      
+      <button class="btn btn-secondary mx-2" 
+              :disabled="pagination.current_page === pagination.last_page" 
+              @click="cargarDatos(pagination.current_page + 1)">
+        Siguiente
+      </button>
     </div>
     <ModalAdmin />
     <ModalAdminUpdate :reservacionId="reservacionId" />
