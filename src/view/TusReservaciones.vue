@@ -20,8 +20,9 @@ export default {
     data() {
         return {
             selectedEvent: null,
+            salas: [],
             date: '2025-01-01',
-            slotMinTime: '06:00:00', // Muestra desde las 6 AM
+            slotMinTime: '06:00:00',
             slotMaxTime: '18:00:00',
             calendarOptions: {
                 plugins: [dayGridPlugin, interactionPlugin, TimeGridPlugin, ListPlugin],
@@ -55,28 +56,46 @@ export default {
         }
     },
     mounted() {
-        this.fetchReservations();
+        this.obtenerSalas();
+        //this.fetchReservations();
+
     },
     methods: {
-        async fetchReservations() {
+        async fetchReservations(salas) {
             try {
                 const reservations = await getReservations();
-                this.formatEvents(reservations);
+                this.formatEvents(reservations,salas);
             } catch (error) {
                 console.error('Error fetching reservations:', error);
             }
         },
-        formatEvents(reservations) {
+        async obtenerSalas() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                this.salas = data.data;
+                console.log("Salas obtenidas:", this.salas);
+                this.fetchReservations(this.salas)
+            } catch (error) {
+                console.error('Error al obtener las salas:', error.message);
+            }
+        },
+        async formatEvents(reservations,salas) {
 
             const getSalaName = (spaceId) => {
-                switch (spaceId) {
-                    case 1: return 'CIC Sala 1';
-                    case 2: return 'CIC Sala 2';
-                    case 3: return 'CIC Sala 3';
-                    case 4: return 'CIC Sala 4';
-                    case 5: return 'Sala de Actos';
-                    default: return 'Sala desconocida';
-                }
+                const sala = salas.find(sala => sala.id === spaceId);
+                return sala ? sala.name : 'Sala desconocida'; 
             };
 
             const getSalaColor = (spaceId) => {
@@ -86,6 +105,9 @@ export default {
                     case 3: return 'blue';
                     case 4: return 'purple';
                     case 5: return 'orange';
+                    case 6: return 'violet';
+                    case 7: return 'brown'; 
+                    case 8: return '#3F51B5';   
                     default: return 'gray';
                 }
             };
@@ -100,8 +122,8 @@ export default {
             }));
 
             // Asegurar que Vue detecte el cambio
-            this.calendarOptions = { 
-                ...this.calendarOptions, 
+            this.calendarOptions = {
+                ...this.calendarOptions,
                 events: [...formattedEvents] // Crear un nuevo array para reactividad
             };
         }
@@ -110,17 +132,16 @@ export default {
 </script>
 
 <template>
-    <NavBarUsuario/>
+    <NavBarUsuario />
     <div class="container mb-5">
         <FullCalendar :options="calendarOptions" />
         <EventForm :date="date" />
         <ModifyEventForm :event="selectedEvent" />
-        <UpdateModal :event="selectedEvent" />
     </div>
 </template>
 
 <style scoped>
-    .fc-event {
-        margin: 0 !important;
-    }
+.fc-event {
+    margin: 0 !important;
+}
 </style>
