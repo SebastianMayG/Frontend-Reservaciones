@@ -3,13 +3,24 @@ import VisualizarReservas from '../view/VisualizarReservas.vue';
 import IniciarSesion from '../view/IniciarSesion.vue';
 import SingIn from '../view/SingIn.vue';
 import TusReservaciones from '@/view/TusReservaciones.vue';
+import VisualizarEspacios from '@/view/VisualizarEspacios.vue';
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/IniciarSesion' 
+  },
   {
     path: '/VisualizarReservas',
     name: 'VisualizarReservas',
     component: VisualizarReservas,
-    meta: { requiresAuth: true, rol: 1 }, // Solo para rol 1
+    meta: { requiresAuth: true, rol: 1 },
+  },
+  {
+    path: '/VisualizarEspacios',
+    name: 'VisualizarEspacios',
+    component: VisualizarEspacios,
+    meta: { requiresAuth: true, rol: 1 },
   },
   {
     path: '/IniciarSesion',
@@ -25,7 +36,7 @@ const routes = [
     path: '/TusReservaciones',
     name: 'TusReservaciones',
     component: TusReservaciones,
-    meta: { requiresAuth: true, rol: 2 }, // Solo para rol 2
+    meta: { requiresAuth: true, rol: 2 },
   },
 ];
 

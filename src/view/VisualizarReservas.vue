@@ -4,16 +4,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import ModalAdmin from '@/components/ModalAdmin.vue';
 import ModalAdminUpdate from '@/components/ModalAdminUpdate.vue';
 import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
+import DataTableColumn from 'primevue/column';
+import ActionButton from 'primevue/button';
+
 export default {
   name: 'VisualizarReservas',
   components: {
     ModalAdmin,
     ModalAdminUpdate,
     DataTable,
-    Column,
-    Button
+    DataTableColumn,
+    ActionButton
   },
   data() {
     return {
@@ -88,7 +89,7 @@ export default {
       }
     },
     async obtenerReservaciones(page) {
-      return this.fetchData(`http://127.0.0.1:8000/api/reservations?page=${page}`);
+      return this.fetchData(`http://127.0.0.1:8000/api/reservations/pagination?page=${page}`);
     },
     async obtenerSalas() {
       return this.fetchData('http://127.0.0.1:8000/api/spaces');
@@ -118,63 +119,33 @@ export default {
 
 <template>
   <div>
-    <!-- Botón para crear reservación -->
     <div class="d-flex justify-content-end mb-3 m-4">
-      <button class="btn btn-primary" @click="abrirModal">Crear Reservación</button>
+      <ActionButton icon="pi pi-check" label="Crear Reservación" severity="info" @click="abrirModal"></ActionButton>
     </div>
 
-    <!-- Contenedor de la tabla con altura fija -->
-    <div class="px-5 table-container">
-      <DataTable :value="reservaciones" tableStyle="min-width: 50rem">
-        <Column field="name" header="Nombre"></Column>
-        <Column field="descripcion" header="Descripción"></Column>
-        <Column field="maestro" header="Maestro"></Column>
-        <Column field="capacidad" header="Capacidad"></Column>
-        <Column field="fecha" header="Fecha y hora"></Column>
-        <Column header="Opciones">
+    <div class="container">
+      <DataTable class="p-datatable-striped p-datatable-gridlines" autoLayout :value="reservaciones" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]">
+        <DataTableColumn field="name" header="Nombre"></DataTableColumn>
+        <DataTableColumn field="descripcion" header="Descripción"></DataTableColumn>
+        <DataTableColumn field="maestro" header="Maestro"></DataTableColumn>
+        <DataTableColumn field="capacidad" header="Capacidad"></DataTableColumn>
+        <DataTableColumn field="fecha" header="Fecha y hora"></DataTableColumn>
+        <DataTableColumn header="Opciones">
           <template #body="slotProps">
-            <Button label="Editar" icon="pi pi-pencil" severity="warn" @click="abrirModalModificar(slotProps.data.id)" class="me-2"/>
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" @click="eliminarReservacion(slotProps.data.id)"/>
+            <div style="display: inline-flex; gap: 5px;"> 
+              <ActionButton label="Editar" icon="pi pi-pencil" severity="warn" @click="abrirModalModificar(slotProps.data.id)"></ActionButton>
+              <ActionButton label="Eliminar" icon="pi pi-trash" severity="danger" @click="eliminarReservacion(slotProps.data.id)"></ActionButton>
+            </div>
           </template>
-        </Column>
+        </DataTableColumn>
       </DataTable>
     </div>
 
-    <!-- Botones de paginación -->
-    <div class="d-flex justify-content-center pagination-buttons">
-      <button class="btn btn-secondary mx-2" 
-              :disabled="pagination.current_page === 1" 
-              @click="cargarDatos(pagination.current_page - 1)">
-        Anterior
-      </button>
-      
-      <span>Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
-      
-      <button class="btn btn-secondary mx-2" 
-              :disabled="pagination.current_page === pagination.last_page" 
-              @click="cargarDatos(pagination.current_page + 1)">
-        Siguiente
-      </button>
-    </div>
-
-    <!-- Modal para crear y modificar reservaciones -->
     <ModalAdmin />
     <ModalAdminUpdate :reservacionId="reservacionId" />
   </div>
 </template>
 
-<style scoped>
-  .table-container {
-    height: 50rem; /* Ajusta esta altura según tus necesidades */
-    overflow-y: auto; /* Añade un scroll vertical si el contenido es demasiado grande */
-    margin-bottom: 1rem; /* Espacio entre la tabla y los botones de paginación */
-  }
+<style>
 
-  .pagination-buttons {
-    position: sticky;
-    bottom: 0;
-    background-color: white; /* Fondo blanco para que los botones no se mezclen con el contenido */
-    padding: 10px 0; /* Espaciado para los botones */
-    z-index: 1; /* Asegura que los botones estén por encima del contenido */
-  }
 </style>
