@@ -162,11 +162,59 @@ export default {
                 }
 
                 const data = await response.json();
-                return data.data;
+                console.log("Horarios de la sala ", salaId, ": ", data.data);
+
+                // Dividir el horario en intervalos de 2 horas
+                const horariosDivididos = this.dividirHorario(data.data);
+
+                return horariosDivididos; // Retorna el horario dividido en intervalos de 2 horas
             } catch (error) {
                 console.error('Error al obtener reservaciones:', error.message);
                 return [];
             }
+        },
+
+        // Método para dividir el horario en intervalos de 2 horas
+        dividirHorario(horario) {
+            const horariosDivididos = [];
+            const { space_id, start_time, end_time } = horario[0]; // Asumiendo que solo hay un horario en el array
+
+            let horaInicio = this.parseHora(start_time);
+            let horaFin = this.parseHora(end_time);
+
+            while (horaInicio < horaFin) {
+                const horaFinIntervalo = new Date(horaInicio);
+                horaFinIntervalo.setHours(horaFinIntervalo.getHours() + 2);
+
+                if (horaFinIntervalo > horaFin) {
+                    horaFinIntervalo.setTime(horaFin.getTime());
+                }
+
+                horariosDivididos.push({
+                    space_id: space_id,
+                    start_time: this.formatHora(horaInicio),
+                    end_time: this.formatHora(horaFinIntervalo)
+                });
+
+                horaInicio = horaFinIntervalo;
+            }
+
+            return horariosDivididos;
+        },
+
+        // Método para convertir una hora en formato 'HH:MM' a un objeto Date
+        parseHora(hora) {
+            const [horas, minutos] = hora.split(':');
+            const fecha = new Date();
+            fecha.setHours(horas, minutos, 0, 0);
+            return fecha;
+        },
+
+        // Método para formatear un objeto Date a 'HH:MM'
+        formatHora(fecha) {
+            const horas = fecha.getHours().toString().padStart(2, '0');
+            const minutos = fecha.getMinutes().toString().padStart(2, '0');
+            return `${horas}:${minutos}`;
         },
         async actualizarHorariosDisponibles() {
             if (this.reservacionData.nameSala && this.reservacionData.fecha) {
