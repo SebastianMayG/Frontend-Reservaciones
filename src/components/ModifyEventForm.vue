@@ -39,47 +39,6 @@ export default {
         showId() {
             console.log("ID de la reservación:", this.reservacionId);
         },
-        updateSelectedHour() {
-            const start_time1 = this.startTime();
-            const end_time1 = this.endTime();
-            console.log("start_time:", start_time1);
-            console.log("end_time:", end_time1);
-
-            if (this.event && this.event.start) {
-                const hours = this.event.start.getHours().toString().padStart(2, '0');
-                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
-                const time_start = `${hours}:${minutes}`;
-
-                if (time_start >= '07:00' && time_start < '09:00') {
-                    this.selectedHour = '1';
-                } else if (time_start >= '09:00' && time_start < '11:00') {
-                    this.selectedHour = '2';
-                } else if (time_start >= '11:00' && time_start < '13:00') {
-                    this.selectedHour = '3';
-                } else if (time_start >= '13:00' && time_start < '15:00') {
-                    this.selectedHour = '4';
-                } else if (time_start >= '15:00' && time_start < '17:00') {
-                    this.selectedHour = '5';
-                }
-            }
-            this.showId();
-        },
-        startTime() {
-            if (this.event && this.event.start) {
-                const hours = this.event.start.getHours().toString().padStart(2, '0');
-                const minutes = this.event.start.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-            return null;
-        },
-        endTime() {
-            if (this.event && this.event.end) {
-                const hours = this.event.end.getHours().toString().padStart(2, '0');
-                const minutes = this.event.end.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-            return null;
-        },
         async obtenerSalas() {
             try {
                 const response = await fetch('http://127.0.0.1:8000/api/spaces', {
@@ -96,6 +55,7 @@ export default {
 
                 const data = await response.json();
                 this.salas = data.data; // Asumiendo que la respuesta es un array de salas
+                //console.log("Salas obtenidas:", this.salas);
             } catch (error) {
                 console.error('Error al obtener las salas:', error.message);
             }
@@ -197,13 +157,62 @@ export default {
                 }
 
                 const data = await response.json();
-                return data.data; // Retorna el horario de una sala en especifico
+                console.log("Horarios de la sala ", salaId, ": ", data.data);
+
+                // Dividir el horario en intervalos de 2 horas
+                const horariosDivididos = this.dividirHorario(data.data);
+
+                return horariosDivididos; // Retorna el horario dividido en intervalos de 2 horas
             } catch (error) {
                 console.error('Error al obtener reservaciones:', error.message);
                 return [];
             }
         },
+
+        // Método para dividir el horario en intervalos de 2 horas
+        dividirHorario(horario) {
+            const horariosDivididos = [];
+            const { space_id, start_time, end_time } = horario[0]; // Asumiendo que solo hay un horario en el array
+
+            let horaInicio = this.parseHora(start_time);
+            let horaFin = this.parseHora(end_time);
+
+            while (horaInicio < horaFin) {
+                const horaFinIntervalo = new Date(horaInicio);
+                horaFinIntervalo.setHours(horaFinIntervalo.getHours() + 2);
+
+                if (horaFinIntervalo > horaFin) {
+                    horaFinIntervalo.setTime(horaFin.getTime());
+                }
+
+                horariosDivididos.push({
+                    space_id: space_id,
+                    start_time: this.formatHora(horaInicio),
+                    end_time: this.formatHora(horaFinIntervalo)
+                });
+
+                horaInicio = horaFinIntervalo;
+            }
+
+            return horariosDivididos;
+        },
+
+        // Método para convertir una hora en formato 'HH:MM' a un objeto Date
+        parseHora(hora) {
+            const [horas, minutos] = hora.split(':');
+            const fecha = new Date();
+            fecha.setHours(horas, minutos, 0, 0);
+            return fecha;
+        },
+
+        // Método para formatear un objeto Date a 'HH:MM'
+        formatHora(fecha) {
+            const horas = fecha.getHours().toString().padStart(2, '0');
+            const minutos = fecha.getMinutes().toString().padStart(2, '0');
+            return `${horas}:${minutos}`;
+        },
         async actualizarHorariosDisponibles() {
+            console.log("Nombre de la sala:", this.reservacionData.nameSala);
             if (this.reservacionData.nameSala && this.reservacionData.fecha) {
                 const salaId = this.getSalaId(this.reservacionData.nameSala);
                 this.todasLasReservaciones = await this.obtenerReservacionesExistente(salaId, this.reservacionData.fecha);
@@ -268,9 +277,7 @@ export default {
         },
         async ejecutarProcesos() {
             try {
-                // Ejecutar los métodos en orden
                 await this.obtenerReservacion(this.reservacionId);
-                await this.obtenerSalas();
                 await this.actualizarDescripcionYCapacidad();
                 await this.actualizarHorariosDisponibles();
             } catch (error) {
@@ -279,27 +286,15 @@ export default {
         },
     },
     mounted() {
-
-        console.log("this.event:", this.event);
-        console.log("this.event.start:", this.event?.start);
-        console.log("this.event.end:", this.event?.end);
-
-        this.updateSelectedHour();
-        if (this.event && this.event.title) {
-            this.selectedTitle = this.event.title;
-        }
-
+        this.obtenerSalas();
 
     },
     watch: {
-        event: {
-            handler: 'updateSelectedHour',
-            immediate: true
-        },
+
         'event.title': {
             handler(newTitle) {
                 this.selectedTitle = newTitle;
-                console.log(this.selectedTitle)
+                console.log('titulo', this.selectedTitle)
                 this.reservacionData.nameSala = newTitle;
             },
             immediate: true
@@ -307,26 +302,27 @@ export default {
         'event.id': {
             handler(newId) {
                 this.reservacionId = newId;
-                // this.obtenerReservacion(this.reservacionId);
-
-                // this.actualizarDescripcionYCapacidad();
-                // this.actualizarHorariosDisponibles();
                 this.ejecutarProcesos();
 
                 console.log("ID de la reservación desde watch:", this.reservacionId);
                 console.log("nombre de la sala desde el watch ", this.reservacionData.nameSala)
                 console.log("fecha de la sala desde el watch", this.reservacionData.fecha)
                 console.log("horarios disponibles desde el watch", this.horariosDisponibles);
+                this.selectedTitle = this.reservacionData.nameSala;
+                console.log('titulo', this.selectedTitle)
+                //this.reservacionData.nameSala = newTitle;
             },
             immediate: true
-        }
+        },
+
+        'reservacionData.nameSala': 'actualizarHorariosDisponibles',
+        'reservacionData.fecha': 'actualizarHorariosDisponibles'
     }
 };
 </script>
 
 <template>
-    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="reservacionModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="modifyModal" tabindex="-1" aria-labelledby="reservacionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
