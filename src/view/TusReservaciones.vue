@@ -34,20 +34,15 @@ export default {
                 },
                 dateClick: (info) => {
                     const dayOfWeek = info.date.getDay();
-                    console.log(dayOfWeek)
+
                     if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                         this.date = info.dateStr.split('T')[0];
-                        console.log(this.date);
                         const modal = new bootstrap.Modal(document.getElementById('reservacionModal'));
                         modal.show();
                     }
                 },
                 eventClick: (info) => {
                     this.selectedEvent = info.event;
-                    console.log(this.selectedEvent)
-                    console.log('ID del evento: ', this.selectedEvent._def.publicId);
-                    console.log('Sala del evento: ', this.selectedEvent._def.title);
-                    console.log(this.selectedEvent._instance.range.start, this.selectedEvent._instance.range.end)
                     const modal = new bootstrap.Modal(document.getElementById('modifyModal'));
                     modal.show();
                 },
@@ -57,8 +52,6 @@ export default {
     },
     mounted() {
         this.obtenerSalas();
-        //this.fetchReservations();
-
     },
     methods: {
         async fetchReservations(salas) {
@@ -85,7 +78,6 @@ export default {
 
                 const data = await response.json();
                 this.salas = data.data;
-                console.log("Salas obtenidas:", this.salas);
                 this.fetchReservations(this.salas)
             } catch (error) {
                 console.error('Error al obtener las salas:', error.message);
