@@ -212,7 +212,6 @@ export default {
             return `${horas}:${minutos}`;
         },
         async actualizarHorariosDisponibles() {
-            console.log("Nombre de la sala:", this.reservacionData.nameSala);
             if (this.reservacionData.nameSala && this.reservacionData.fecha) {
                 const salaId = this.getSalaId(this.reservacionData.nameSala);
                 this.todasLasReservaciones = await this.obtenerReservacionesExistente(salaId, this.reservacionData.fecha);
@@ -294,7 +293,6 @@ export default {
         'event.title': {
             handler(newTitle) {
                 this.selectedTitle = newTitle;
-                console.log('titulo', this.selectedTitle)
                 this.reservacionData.nameSala = newTitle;
             },
             immediate: true
@@ -303,14 +301,7 @@ export default {
             handler(newId) {
                 this.reservacionId = newId;
                 this.ejecutarProcesos();
-
-                console.log("ID de la reservación desde watch:", this.reservacionId);
-                console.log("nombre de la sala desde el watch ", this.reservacionData.nameSala)
-                console.log("fecha de la sala desde el watch", this.reservacionData.fecha)
-                console.log("horarios disponibles desde el watch", this.horariosDisponibles);
                 this.selectedTitle = this.reservacionData.nameSala;
-                console.log('titulo', this.selectedTitle)
-                //this.reservacionData.nameSala = newTitle;
             },
             immediate: true
         },

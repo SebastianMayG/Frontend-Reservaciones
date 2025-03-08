@@ -120,7 +120,7 @@ export default {
     </div>
 
     <div class="container">
-        <DataTable class="p-datatable-striped p-datatable-gridlines" autoLayout :value="espacios">
+        <DataTable class="p-datatable-striped p-datatable-gridlines" autoLayout :value="espacios" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]">
             <DataTableColumn field="name" header="Nombre"></DataTableColumn>
             <DataTableColumn field="description" header="Descripción"></DataTableColumn>
             <DataTableColumn field="capacity" header="Capacidad"></DataTableColumn>
