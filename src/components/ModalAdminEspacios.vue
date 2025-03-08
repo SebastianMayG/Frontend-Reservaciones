@@ -103,18 +103,15 @@ export default {
                                 <select id="horarioSelect" class="form-select" v-model="espacioData.start_time" required>
                                     <option value="" disabled selected>Hora de apertura</option>
                                     <option value="07:00">7:00</option>
-                                    <option value="08:00">8:00</option>
                                     <option value="09:00">9:00</option>
-                                    <option value="10:00">10:00</option>
+                                    <option value="11:00">11:00</option>
                                 </select>
                             </div>
                             <div class="col mb-3">
                                 <select id="horarioSelectEnd" class="form-select" v-model="espacioData.end_time" required>
                                     <option value="" disabled selected>Hora de cierre</option>
                                     <option value="13:00">13:00</option>
-                                    <option value="14:00">14:00</option>
                                     <option value="15:00">15:00</option>
-                                    <option value="16:00">16:00</option>
                                     <option value="17:00">17:00</option>
                                 </select>
                             </div>

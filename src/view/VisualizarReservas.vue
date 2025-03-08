@@ -20,10 +20,6 @@ export default {
     return {
       reservaciones: [],
       reservacionId: null,
-      // pagination: {
-      //   current_page: 1,
-      //   last_page: 1,
-      // },
     };
   },
   mounted() {
@@ -56,7 +52,7 @@ export default {
         });
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         alert("Reservación eliminada con éxito");
-        // this.cargarDatos(this.pagination.current_page);
+        this.cargarDatos();
       } catch (error) {
         console.error('Error al eliminar la reservación:', error.message);
         alert("Error al eliminar la reservación");
@@ -70,7 +66,7 @@ export default {
           this.obtenerMaestros()
         ]);
 
-        this.reservaciones = reservaciones.data.map(reserva => { // Ajuste aquí
+        this.reservaciones = reservaciones.data.map(reserva => { 
           let space = salas.data.find(sala => sala.id === reserva.space_id) || {};
           let maestro = maestros.data.find(m => m.id === reserva.user_id) || {};
           return {
@@ -88,7 +84,6 @@ export default {
       }
     },
     async obtenerReservaciones() {
-      // return this.fetchData(`http://127.0.0.1:8000/api/reservations/pagination?page=${page}`);
       return this.fetchData(`http://127.0.0.1:8000/api/reservations`);
     },
     async obtenerSalas() {
@@ -152,14 +147,5 @@ export default {
 </template>
 
 <style>
-.p-paginator {
-  min-width: 300px;
-  max-width: 100%;
-  overflow-x: auto;
-  white-space: nowrap;
-}
 
-.p-paginator .p-paginator-pages {
-  display: inline-block;
-}
 </style>

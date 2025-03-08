@@ -81,7 +81,7 @@ export default {
                 });
                 if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                 alert("Espacio eliminada con éxito");
-                this.cargarDatos();
+                await this.cargarDatos();
             } catch (error) {
                 console.error('Error al eliminar el espacio:', error.message);
                 alert("Error al eliminar el espacio");
