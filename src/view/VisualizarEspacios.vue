@@ -116,7 +116,7 @@ export default {
 <template>
 
     <div class="d-flex justify-content-end mb-3 m-4">
-        <ActionButton icon="pi pi-check" label="Crear Reservación" severity="info" @click="abrirModal"></ActionButton>
+        <ActionButton icon="pi pi-check" label="Crear Espacio" severity="info" @click="abrirModal"></ActionButton>
     </div>
 
     <div class="container">
