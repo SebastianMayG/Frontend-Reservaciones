@@ -62,16 +62,8 @@ export default {
         },
         async updateReservacion() {
             try {
-
-                const hoy = new Date().toISOString().split('T')[0];
-                console.log(hoy)
-
-                if (this.reservacionData.fecha <= hoy) {
-                    alert("No puede modificar una reservacion en menos de 24 horas a esta");
-                    return; // Detiene la ejecución del método
-                }
                 const horarioSeleccionado = this.reservacionData.hour;
-                const start_time = horarioSeleccionado.start
+                const start_time = horarioSeleccionado.start;
                 const end_time = horarioSeleccionado.end;
                 const reservacion = {
                     space_id: this.getSalaId(this.reservacionData.nameSala),
@@ -80,16 +72,17 @@ export default {
                     start_time: start_time,
                     end_time: end_time,
                 };
-                console.log("reservacion enviando", reservacion);
 
                 await actualizarReservacion(this.reservacionId, reservacion);
                 const modal = bootstrap.Modal.getInstance(document.getElementById('modifyModal'));
                 modal.hide();
                 window.location.reload();
+
             } catch (error) {
                 console.error('Error al guardar la reservación:', error);
             }
-        },
+        }
+        ,
         async obtenerReservacionesExistente(salaId, fecha) {
             try {
                 const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
