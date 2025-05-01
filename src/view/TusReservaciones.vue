@@ -8,6 +8,8 @@ import EventForm from '@/components/EventForm.vue';
 import NavBarUsuario from '@/components/NavBarUsuario.vue';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import ModifyEventForm from '@/components/ModifyEventForm.vue';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
 import { getReservations } from '@/services/getReservations';
 
 export default {
@@ -16,9 +18,13 @@ export default {
         EventForm,
         NavBarUsuario,
         ModifyEventForm,
+        Button,
+        Dialog
     },
     data() {
         return {
+            showErrorDialog: false,
+            errorMessage: '',
             selectedEvent: null,
             salas: [],
             date: '2025-01-01',
@@ -34,7 +40,17 @@ export default {
                 },
                 dateClick: (info) => {
                     const dayOfWeek = info.date.getDay();
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
 
+                    const fechaSeleccionada = new Date(info.date);
+                    fechaSeleccionada.setHours(0, 0, 0, 0);
+
+                    if (fechaSeleccionada < today) {
+                        this.errorMessage = "No se puede reservar en una fecha pasada";
+                        this.showErrorDialog = true;
+                        return;
+                    }
                     if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                         this.date = info.dateStr.split('T')[0];
                         const modal = new bootstrap.Modal(document.getElementById('reservacionModal'));
@@ -42,6 +58,19 @@ export default {
                     }
                 },
                 eventClick: (info) => {
+                    const today = new Date();
+                    const event = info.event;
+
+                    const fechaHoraOriginalEvento = event.start;
+                    const diferenciaMs = fechaHoraOriginalEvento - today;
+                    const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+
+                    if (diferenciaHoras < 24) {
+                        this.errorMessage = "No puede modificar una reservación con menos de 24 horas de anticipación";
+                        this.showErrorDialog = true;
+                        return;
+                    }
+
                     this.selectedEvent = info.event;
                     const modal = new bootstrap.Modal(document.getElementById('modifyModal'));
                     modal.show();
@@ -57,7 +86,7 @@ export default {
         async fetchReservations(salas) {
             try {
                 const reservations = await getReservations();
-                this.formatEvents(reservations,salas);
+                this.formatEvents(reservations, salas);
             } catch (error) {
                 console.error('Error fetching reservations:', error);
             }
@@ -83,11 +112,11 @@ export default {
                 console.error('Error al obtener las salas:', error.message);
             }
         },
-        async formatEvents(reservations,salas) {
+        async formatEvents(reservations, salas) {
 
             const getSalaName = (spaceId) => {
                 const sala = salas.find(sala => sala.id === spaceId);
-                return sala ? sala.name : 'Sala desconocida'; 
+                return sala ? sala.name : 'Sala desconocida';
             };
 
             const getSalaColor = (spaceId) => {
@@ -98,8 +127,8 @@ export default {
                     case 4: return 'purple';
                     case 5: return 'orange';
                     case 6: return 'violet';
-                    case 7: return 'brown'; 
-                    case 8: return '#3F51B5';   
+                    case 7: return 'brown';
+                    case 8: return '#3F51B5';
                     default: return 'gray';
                 }
             };
@@ -129,6 +158,12 @@ export default {
         <FullCalendar :options="calendarOptions" />
         <EventForm :date="date" />
         <ModifyEventForm :event="selectedEvent" />
+        <Dialog v-model:visible="showErrorDialog" modal header="Error" :style="{ width: '400px' }">
+            <p>{{ errorMessage }}</p>
+            <template #footer>
+                <Button label="Entendido" @click="showErrorDialog = false"></Button>
+            </template>
+        </Dialog>
     </div>
 </template>
 
