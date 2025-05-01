@@ -28,12 +28,16 @@
                         <FloatLabel variant="in" class="w-100">
                             <InputText type="email" id="email" v-model="form.email" class="w-100" required />
                             <label for="email">Email</label>
+                            <Message v-if="emailError" severity="error" :closable="false" class="absolute ml-2"
+                                style="left: 100%; top: 0; white-space: nowrap;">
+                                {{ emailError }}
+                            </Message>
                         </FloatLabel>
                     </div>
                     <div class="mb-3 d-flex">
                         <img src="https://icons.veryicon.com/png/o/application/a-group-of-common-linear-icon/password-17.png"
                             class="icon m-2">
-                            <FloatLabel variant="in" class="w-100">
+                        <FloatLabel variant="in" class="w-100">
                             <InputText type="password" id="password" v-model="form.password" class="w-100" required />
                             <label for="password">Password</label>
                         </FloatLabel>
@@ -51,11 +55,13 @@
 <script>
 import FloatLabel from 'primevue/floatlabel'; // Importa FloatLabel
 import InputText from 'primevue/inputtext'; // Importa InputText
+import Message from 'primevue/message';
 
 export default {
     components: {
         FloatLabel,
         InputText,
+        Message
     },
     data() {
         return {
@@ -64,7 +70,8 @@ export default {
                 last_name: '',
                 email: '',
                 password: ''
-            }
+            },
+            emailError: ''
         };
     },
     methods: {
@@ -76,8 +83,17 @@ export default {
             });
         },
         async registerUser() {
-            try {
+            // 1. Validación del email con PrimeVue Message
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(this.form.email)) {
+                this.emailError = 'Ingrese un correo válido (ej: usuario@dominio.com)';
+                return; // Detiene la ejecución
+            } else {
+                this.emailError = ''; // Limpia el error si es válido
+            }
 
+            // 2. El resto de tu código EXACTAMENTE igual
+            try {
                 const response = await fetch('http://127.0.0.1:8000/api/register', {
                     method: 'POST',
                     headers: {
@@ -103,20 +119,18 @@ export default {
                     this.setAuthHeader(token);
                     if (localStorage.getItem('rol') == 1) {
                         this.$router.push('/VisualizarReservas');
-
                     } else {
                         this.$router.push('/TusReservaciones');
                     }
-                    //            this.$router.push('/'); // Redirige a la pagina principal
                 } else {
-                    alert(data.message || 'Credenciales incorrectas.');
+                    this.emailError = data.message || 'Credenciales incorrectas.'; // Usamos Message aquí también
                     console.log(data.errors);
                 }
             } catch (error) {
                 console.error('Error al registarte:', error);
-                alert('Error al registarte. Intentalo de nuevo.');
+                this.emailError = 'Error al registrarse. Intente nuevamente.'; // Usamos Message para errores
             }
-        },
+        }
 
 
 
