@@ -1,12 +1,16 @@
 // src/services/reservacionService.js
-import { inject } from 'vue';
-const urlBackend = inject('urlBack');
+
+import { config } from '@/config';
+
 export async function crearReservacion(reservacionData) {
     try {
       const token = localStorage.getItem('token');
       console.log(JSON.stringify(reservacionData))
-      const response = await fetch(`${urlBackend}/api/reservations`, {
-        method: 'POST',
+      // const urlBack = inject('urlBack');
+      // console.log(urlBack)
+
+      const response = await fetch(`${config.API_URL}/api/reservations`, {
+        method: 'POST', 
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
