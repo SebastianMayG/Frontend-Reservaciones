@@ -36,7 +36,7 @@ export default {
             }
         },
         async crearEspacio(espacio) {
-            const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+            const response = await fetch('http://localhost:8000/api/spaces', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export default {
             return response.json();
         },
         async crearHorario(id, start_time, end_time) {
-            const response = await fetch('http://127.0.0.1:8000/api/schedules', {
+            const response = await fetch('http://localhost:8000/api/schedules', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

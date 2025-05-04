@@ -26,7 +26,7 @@ export default {
     methods: {
         async obtenerSalas() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+                const response = await fetch('http://localhost:8000/api/spaces', {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default {
         },
         async obtenerReservacionesExistente(salaId, fecha) {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/reservations/${fecha}/${salaId}`, {
+                const response = await fetch(`http://localhost:8000/api/reservations/${fecha}/${salaId}`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export default {
         },
         async obtenerHorariosSala(salaId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/schedules/space/${salaId}`, {
+        const response = await fetch(`http://localhost:8000/api/schedules/space/${salaId}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
