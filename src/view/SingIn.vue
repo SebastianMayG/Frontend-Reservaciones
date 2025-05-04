@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         setAuthHeader(token) {
-            fetch('http://127.0.0.1:8000/api/users', {
+            fetch('http://localhost:8000/api/users', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -94,7 +94,7 @@ export default {
 
             // 2. El resto de tu código EXACTAMENTE igual
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/register', {
+                const response = await fetch('http://localhost:8000/api/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
