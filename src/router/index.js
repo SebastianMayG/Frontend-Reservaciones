@@ -50,23 +50,24 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('token'); // Verifica si el usuario está autenticado
   const userRole = parseInt(localStorage.getItem('rol'), 10); // Obtiene el rol del usuario (convertido a número)
 
-  // Verifica si la ruta requiere autenticación
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/IniciarSesion'); // Redirige al login si no está autenticado
+    // Si no está autenticado y la ruta requiere auth
+    next('/IniciarSesion');
   } else if (to.meta.requiresAuth && isAuthenticated) {
-    // Verifica si el rol del usuario tiene acceso a la ruta
+    // Si está autenticado pero su rol no coincide
     if (to.meta.rol && to.meta.rol !== userRole) {
-        if(userRole == 1){
-            next('/VisualizarReservas'); // Redirige a una ruta por defecto si no tiene permiso
-           }else{
-            next('/TusReservaciones'); // Redirige a una ruta por defecto si no tiene permiso
-           }
-      //next('/'); // Redirige a una ruta por defecto si no tiene permiso
+      if (userRole === 1 && to.path !== '/VisualizarReservas') {
+        next('/VisualizarReservas');
+      } else if (userRole === 2 && to.path !== '/TusReservaciones') {
+        next('/TusReservaciones');
+      } else {
+        next(); // Ya está en la ruta correcta
+      }
     } else {
-      next(); // Permite el acceso
+      next(); // Tiene acceso permitido
     }
   } else {
-    next(); // Permite el acceso a rutas públicas
+    next(); // Ruta pública
   }
 });
 

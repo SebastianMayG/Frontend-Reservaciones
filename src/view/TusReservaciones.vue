@@ -93,7 +93,7 @@ export default {
         },
         async obtenerSalas() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/spaces', {
+                const response = await fetch('http://localhost:8000/api/spaces', {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
