@@ -73,7 +73,7 @@ export default {
             if (!confirmacion) return;
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/spaces/${id}`, {
+                const response = await fetch(`http://localhost:8000/api/spaces/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -88,10 +88,10 @@ export default {
             }
         },
         async obtenerSalas() {
-            return this.fetchData('http://127.0.0.1:8000/api/spaces');
+            return this.fetchData('http://localhost:8000/api/spaces');
         },
         async obtenerHorarios() {
-            return this.fetchData('http://127.0.0.1:8000/api/schedules');
+            return this.fetchData('http://localhost:8000/api/schedules');
         },
         async fetchData(url) {
             try {
