@@ -1,10 +1,12 @@
+import { inject } from 'vue';
+const urlBackend = inject('urlBack');
 export async function actualizarReservacion(id, reservacionData) {
     try {
         const token = localStorage.getItem('token');
         console.log(JSON.stringify(reservacionData));
 
         // Asegúrate de que 'id' se inserte correctamente en la URL
-        const response = await fetch(`http://127.0.0.1:8000/api/reservations/${id}`, {
+        const response = await fetch(`${urlBackend}/api/reservations/${id}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
