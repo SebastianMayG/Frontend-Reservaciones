@@ -3,6 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap';
 
 export default {
+    inject: ['urlBack'],
     name: 'CrearEspacios',
     data() {
         return {
@@ -36,7 +37,7 @@ export default {
             }
         },
         async crearEspacio(espacio) {
-            const response = await fetch('http://localhost:8000/api/spaces', {
+            const response = await fetch(`${this.urlBack}/api/spaces`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ export default {
             return response.json();
         },
         async crearHorario(id, start_time, end_time) {
-            const response = await fetch('http://localhost:8000/api/schedules', {
+            const response = await fetch(`${this.urlBack}/api/schedules`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

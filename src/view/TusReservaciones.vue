@@ -13,6 +13,7 @@ import Button from 'primevue/button';
 import { getReservations } from '@/services/getReservations';
 
 export default {
+    inject: ['urlBack'],
     components: {
         FullCalendar,
         EventForm,
@@ -93,7 +94,7 @@ export default {
         },
         async obtenerSalas() {
             try {
-                const response = await fetch('http://localhost:8000/api/spaces', {
+                const response = await fetch(`${this.urlBack}/api/spaces`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',

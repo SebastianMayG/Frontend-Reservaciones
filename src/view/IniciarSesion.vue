@@ -40,6 +40,7 @@ import FloatLabel from 'primevue/floatlabel'; // Importa FloatLabel
 import InputText from 'primevue/inputtext'; // Importa InputText
 
 export default {
+  inject: ['urlBack'],
   components: {
     FloatLabel,
     InputText,
@@ -53,7 +54,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await fetch('http://localhost:8000/api/login', {
+        const response = await fetch(`${this.urlBack}/api/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default {
       }
     },
     setAuthHeader(token) {
-      fetch('http://localhost:8000/api/users', {
+      fetch(`${this.urlBack}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
