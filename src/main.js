@@ -14,6 +14,7 @@ import DataTableColumn  from 'primevue/column';
 import ActionButton from 'primevue/button';
 
 const app = createApp(App);
+app.provide('urlBack', 'http://localhost:8000');
 
 app.use(router);
 app.use(PrimeVue, {

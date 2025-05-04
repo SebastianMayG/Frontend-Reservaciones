@@ -8,6 +8,7 @@ import DataTableColumn from 'primevue/column';
 import ActionButton from 'primevue/button';
 
 export default {
+  inject: ['urlBack'],
   name: 'VisualizarReservas',
   components: {
     ModalAdmin,
@@ -44,7 +45,7 @@ export default {
       if (!confirmacion) return;
 
       try {
-        const response = await fetch(`http://localhost:8000/api/reservations/${id}`, {
+        const response = await fetch(`${this.urlBack}/api/reservations/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -84,13 +85,13 @@ export default {
       }
     },
     async obtenerReservaciones() {
-      return this.fetchData(`http://localhost:8000/api/reservations`);
+      return this.fetchData(`${this.urlBack}/api/reservations`);
     },
     async obtenerSalas() {
-      return this.fetchData('http://localhost:8000/api/spaces');
+      return this.fetchData(`${this.urlBack}/api/spaces`);
     },
     async obtenerMaestros() {
-      return this.fetchData('http://localhost:8000/api/users');
+      return this.fetchData(`${this.urlBack}/api/users`);
     },
     async fetchData(url) {
       try {

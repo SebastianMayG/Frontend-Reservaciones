@@ -8,6 +8,7 @@ import ModalAdminEspacios from '@/components/ModalAdminEspacios.vue';
 import ModalAdminSpaceUpdate from '@/components/ModalAdminSpaceUpdate.vue';
 
 export default {
+    inject: ['urlBack'],
     name: 'VisualizarEspacios',
     components: {
         DataTable,
@@ -73,7 +74,7 @@ export default {
             if (!confirmacion) return;
 
             try {
-                const response = await fetch(`http://localhost:8000/api/spaces/${id}`, {
+                const response = await fetch(`${this.urlBack}/api/spaces/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -88,10 +89,10 @@ export default {
             }
         },
         async obtenerSalas() {
-            return this.fetchData('http://localhost:8000/api/spaces');
+            return this.fetchData(`${this.urlBack}/api/spaces`);
         },
         async obtenerHorarios() {
-            return this.fetchData('http://localhost:8000/api/schedules');
+            return this.fetchData(`${this.urlBack}/api/schedules`);
         },
         async fetchData(url) {
             try {
