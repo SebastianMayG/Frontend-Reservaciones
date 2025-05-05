@@ -14,6 +14,9 @@ import { RouterLink } from 'vue-router';
         <li class="nav-item">
             <RouterLink to = "/TusReservaciones" class="nav-link active palabras" aria-current="page" >Tus Reservaciones</RouterLink>
         </li>
+        <li class="nav-item">
+            <RouterLink to = "/VistaPracticas" class="nav-link active palabras" aria-current="page" >Ver Practicas</RouterLink>
+        </li>
       </ul>
       <div class="ms-auto d-flex align-items-center">
           <RouterLink to="/IniciarSesion" class="btn btn-outline-light me-2">Cerrar sesión</RouterLink>

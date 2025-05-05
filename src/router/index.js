@@ -5,6 +5,8 @@ import SingIn from '../view/SingIn.vue';
 import TusReservaciones from '@/view/TusReservaciones.vue';
 import VisualizarEspacios from '@/view/VisualizarEspacios.vue';
 import ListaAsistencia from '@/view/ListaAsistencia.vue'
+import VisualizarPracticas from '@/view/VisualizarPracticas.vue' 
+import VistaPracticas from '@/view/VistaPracticas.vue'
 
 const routes = [
   {
@@ -15,6 +17,12 @@ const routes = [
     path: '/VisualizarReservas',
     name: 'VisualizarReservas',
     component: VisualizarReservas,
+    meta: { requiresAuth: true, rol: 1 },
+  },
+  {
+    path: '/VisualizarPracticas',
+    name: 'VisualizarPracticas',
+    component: VisualizarPracticas,
     meta: { requiresAuth: true, rol: 1 },
   },
   {
@@ -37,6 +45,12 @@ const routes = [
     path: '/TusReservaciones',
     name: 'TusReservaciones',
     component: TusReservaciones,
+    meta: { requiresAuth: true, rol: 2 },
+  },
+  {
+    path: '/VistaPracticas',
+    name: 'VistaPracticas',
+    component: VistaPracticas,
     meta: { requiresAuth: true, rol: 2 },
   },
   {

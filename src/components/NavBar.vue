@@ -58,6 +58,9 @@ const logout = async () => {
           <li class="nav-item">
             <RouterLink to="/VisualizarEspacios" class="nav-link palabras">Visualizar Espacios</RouterLink>
           </li>
+          <li class="nav-item">
+            <RouterLink to="/VisualizarPracticas" class="nav-link palabras">Visualizar Practicas</RouterLink>
+          </li>
         </ul>
         <div class="ms-auto d-flex align-items-center">
           <RouterLink v-if="!isLoggedIn" to="/IniciarSesion" class="btn btn-outline-light me-2">Iniciar sesión</RouterLink>
