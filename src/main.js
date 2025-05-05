@@ -12,6 +12,7 @@ import Aura from '@primevue/themes/aura';
 import DataTable from 'primevue/datatable';
 import DataTableColumn  from 'primevue/column';
 import ActionButton from 'primevue/button';
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
 app.provide('urlBack', 'http://localhost:8000');
@@ -32,5 +33,6 @@ app.use(PrimeVue, {
 app.component('DataTable', DataTable);
 app.component('DataTableColumn', DataTableColumn);
 app.component('ActionButton', ActionButton);
+app.use(ToastService);
 
 app.mount('#app');

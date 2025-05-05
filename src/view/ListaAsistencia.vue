@@ -1,8 +1,11 @@
 <script>
-
+import Toast from 'primevue/toast';
 
 export default {
   name: 'ListaAsistencia',
+  components: {
+    Toast
+  },
   data() {
     return {
       reservacion: {
@@ -15,18 +18,55 @@ export default {
         reservation: ''
       },
       alumnos: [{
-        matricula: null, // Cambiado a null para manejar números
+        matricula: null,
         nombre: '',
         focus: true
       }],
-      lastTabTime: 0
+      lastTabTime: 0,
+      loading: false,
+      assistanceId: null,
+      pdfLoading: false,
+      listaGuardada: false,
+      listaExistente: false
     };
   },
   created() {
     this.cargarDatosReservacion();
+    this.verificarListaExistente();
   },
   methods: {
+    async verificarListaExistente() {
+      if (!this.reservacion.id) return;
+      
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8000/assistances/reservation/${this.reservacion.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.exists) {
+            this.listaExistente = true;
+            this.assistanceId = data.id;
+            this.listaGuardada = true;
+            this.$toast.add({
+              severity: 'warn',
+              summary: 'Lista ya existente',
+              detail: 'Ya existe una lista de asistencia para esta reservación',
+              life: 5000
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error al verificar lista existente:', error);
+      }
+    },
+
     cargarDatosReservacion() {
+      this.reservacion.id = parseInt(this.$route.query.id) || null;
       this.reservacion.sala_name = this.$route.query.sala_name || '';
       this.reservacion.date = this.$route.query.date || '';
       this.reservacion.description = this.$route.query.description || '';
@@ -34,19 +74,16 @@ export default {
       this.reservacion.teacher = this.$route.query.teacher || '';
       this.reservacion.reservation = this.$route.query.reservation || '';
     },
-    
+
     agregarAlumno() {
-      // Convertir matrícula a string para la validación
       const matriculaStr = String(this.alumnos[this.alumnos.length - 1].matricula || '');
-      
-      // Agregar nuevo input solo si hay contenido
+
       if (matriculaStr.trim() !== '') {
         this.alumnos.push({
-          matricula: null, // Permitir valores numéricos
+          matricula: null,
           nombre: '',
           focus: true
         });
-        
         this.$nextTick(() => {
           const inputs = document.querySelectorAll('.matricula-input');
           if (inputs.length > 0) {
@@ -55,7 +92,6 @@ export default {
         });
       }
     },
-    
     eliminarAlumno(index) {
       if (this.alumnos.length > 1) {
         this.alumnos.splice(index, 1);
@@ -64,14 +100,13 @@ export default {
         this.alumnos[0].nombre = '';
       }
     },
-    
     manejarTab(index, event) {
       const now = new Date().getTime();
       const isDoubleTab = now - this.lastTabTime < 300;
       this.lastTabTime = now;
-      
+
       const matriculaStr = String(this.alumnos[index].matricula || '');
-      
+
       if (isDoubleTab || event.shiftKey) {
         event.preventDefault();
         this.agregarAlumno();
@@ -80,21 +115,34 @@ export default {
         this.agregarAlumno();
       }
     },
+
     async enviarAsistencia() {
+      if (this.listaExistente) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Ya existe una lista de asistencia para esta reservación',
+          life: 5000
+        });
+        return;
+      }
+
       this.loading = true;
-      
+
       try {
-        // Filtrar alumnos con matrícula válida
+        if (!this.reservacion.id) {
+          throw new Error('No se ha seleccionado una reservación válida');
+        }
+
         const alumnosFiltrados = this.alumnos.filter(alumno => {
           const matriculaStr = String(alumno.matricula || '');
           return matriculaStr.trim() !== '';
         });
-        
+
         if (alumnosFiltrados.length === 0) {
           throw new Error('Debe agregar al menos un alumno');
         }
-        
-        // Preparar datos para enviar
+
         const payload = {
           reservation: {
             id: this.reservacion.id
@@ -103,7 +151,7 @@ export default {
             id: parseInt(alumno.matricula)
           }))
         };
-        
+
         // Enviar datos al backend
         const response = await fetch('http://localhost:8000/assistances', {
           method: 'POST',
@@ -113,24 +161,24 @@ export default {
           },
           body: JSON.stringify(payload)
         });
-        
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || 'Error al enviar la asistencia');
         }
-        
+
         const data = await response.json();
-        
+        this.assistanceId = data.id;
+        this.listaGuardada = true;
+        this.listaExistente = true;
+
         this.$toast.add({
           severity: 'success',
           summary: 'Asistencia registrada',
           detail: 'La lista de asistencia se ha guardado correctamente',
           life: 3000
         });
-        
-        // Generar PDF después de enviar
-        this.generarPDF(data.id);
-        
+
       } catch (error) {
         this.$toast.add({
           severity: 'error',
@@ -142,26 +190,70 @@ export default {
         this.loading = false;
       }
     },
-    async generarPDF(assistanceId) {
-      try {
-        // Descargar el PDF directamente
-        window.open(`http://localhost:8000/assistances/${assistanceId}/pdf`, '_blank');  
-        
-      } catch (error) {
+
+    async generarPDF() {
+      if (!this.assistanceId) {
         this.$toast.add({
-          severity: 'warn',
-          summary: 'PDF no generado',
-          detail: 'La asistencia se guardó pero hubo un problema al generar el PDF',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Primero debe guardar la lista de asistencia',
           life: 5000
         });
+        return;
       }
+
+      this.pdfLoading = true;
+      
+      try {
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Error de autenticación',
+            detail: 'No se encontró el token de acceso',
+            life: 5000
+          });
+          return;
+        }
+        
+        const response = await fetch(`http://localhost:8000/assistances/${this.assistanceId}/pdf`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al generar el PDF');
+        }
+
+        // Crear un blob con la respuesta y mostrarlo en nueva pestaña
+        const blob = await response.blob();
+        const pdfUrl = URL.createObjectURL(blob);
+        window.open(pdfUrl, '_blank');
+
+      } catch (error) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Error al generar PDF',
+          detail: error.message,
+          life: 5000
+        });
+      } finally {
+        this.pdfLoading = false;
+      }
+    },
+
+    guardarLista() {
+      this.enviarAsistencia();
     }
   }
 };
 </script>
 
 <template>
-  <!-- El template permanece igual que en la versión anterior -->
+  <Toast />
   <div class="container">
     <h1>Lista de asistencia</h1>
     <div class="reservacion-info">
@@ -191,50 +283,47 @@ export default {
         <input type="text" id="reservation" v-model="reservacion.reservation" disabled>
       </div>
     </div>
-    
+
     <div class="asistencia-section">
       <b>Asistencia</b>
-      <div v-for="(alumno, index) in alumnos" :key="index" class="alumno-input-group">
-        <div class="form-group">
-          <label :for="'matricula-' + index">Matrícula</label>
-          <input
-            :id="'matricula-' + index"
-            type="number"
-            v-model.number="alumno.matricula"
-            class="matricula-input"
-            @keydown.tab="manejarTab(index, $event)"
-            @keyup.enter="agregarAlumno"
-            :ref="'matricula-' + index"
-            :autofocus="alumno.focus"
-          >
-        </div>
-        <div class="form-group">
-          <label :for="'nombre-' + index">Nombre (opcional)</label>
-          <input
-            :id="'nombre-' + index"
-            type="text"
-            v-model="alumno.nombre"
-            @keyup.enter="agregarAlumno"
-          >
-        </div>
-        <button 
-          @click="eliminarAlumno(index)" 
-          class="btn-eliminar"
-          v-if="alumnos.length > 1"
-        >
-        </button>
+      <div v-if="listaExistente" class="lista-existente-message">
+        <p>Ya se ha generado una lista de asistencia para esta reservación.</p>
+        <p>Puedes generar el PDF nuevamente si lo necesitas.</p>
       </div>
-      
+      <div v-else>
+        <div v-for="(alumno, index) in alumnos" :key="index" class="alumno-input-group">
+          <div class="form-group">
+            <label :for="'matricula-' + index">Matrícula</label>
+            <input :id="'matricula-' + index" type="number" v-model.number="alumno.matricula" class="matricula-input"
+              @keydown.tab="manejarTab(index, $event)" @keyup.enter="agregarAlumno" :ref="'matricula-' + index"
+              :autofocus="alumno.focus">
+          </div>
+          <div class="form-group">
+            <label :for="'nombre-' + index">Nombre (opcional)</label>
+            <input :id="'nombre-' + index" type="text" v-model="alumno.nombre" @keyup.enter="agregarAlumno">
+          </div>
+          <button @click="eliminarAlumno(index)" class="btn-eliminar" v-if="alumnos.length > 1">
+            ×
+          </button>
+        </div>
+      </div>
+
       <div class="action-buttons">
-        <button @click="agregarAlumno" class="btn-agregar">+ Agregar Alumno</button>
-        <button @click="generarLista" class="btn-generar">Generar lista de asistencia</button>
+        <button @click="agregarAlumno" class="btn-agregar" v-if="!listaExistente">
+          + Agregar Alumno
+        </button>
+        <button @click="guardarLista" class="btn-generar" :disabled="loading || listaExistente">
+          {{ loading ? 'Procesando...' : (listaExistente ? 'Lista ya guardada' : 'Guardar lista de asistencia') }}
+        </button>
+        <button @click="generarPDF" class="btn-PDF" :disabled="!listaGuardada || pdfLoading">
+          {{ pdfLoading ? 'Generando...' : '📄 Generar PDF' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Los estilos permanecen iguales */
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -334,7 +423,34 @@ input:disabled {
   cursor: pointer;
 }
 
+.btn-PDF {
+  background: #f32121;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .btn-generar:hover {
   background: #0b7dda;
+}
+
+.btn-PDF:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.btn-generar:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.lista-existente-message {
+  background: #fff8e1;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border-left: 4px solid #ffc107;
 }
 </style>
