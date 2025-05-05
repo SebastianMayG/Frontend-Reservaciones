@@ -27,6 +27,20 @@ export default {
     this.cargarDatos();
   },
   methods: {
+    listaAsistencia(reserva) {
+      this.$router.push({
+        path: '/ListaAsistencia',
+        query: {
+          id: reserva.id,
+          sala_name: reserva.name,
+          date: reserva.fecha.split(' | ')[0],
+          description: reserva.descripcion,
+          capacity: reserva.capacidad,
+          teacher: reserva.maestro,
+          reservation: reserva.fecha.split(' | ')[1]
+        }
+      });
+    },
     abrirModal() {
       new bootstrap.Modal(document.getElementById('adminModal')).show();
     },
@@ -67,7 +81,7 @@ export default {
           this.obtenerMaestros()
         ]);
 
-        this.reservaciones = reservaciones.data.map(reserva => { 
+        this.reservaciones = reservaciones.data.map(reserva => {
           let space = salas.data.find(sala => sala.id === reserva.space_id) || {};
           let maestro = maestros.data.find(m => m.id === reserva.user_id) || {};
           return {
@@ -119,7 +133,8 @@ export default {
       <ActionButton icon="pi pi-check" label="Crear Reservación" severity="info" @click="abrirModal"></ActionButton>
     </div>
     <div class="container">
-      <DataTable class="p-datatable-striped p-datatable-gridlines" :value="reservaciones" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
+      <DataTable class="p-datatable-striped p-datatable-gridlines" :value="reservaciones" paginator :rows="5"
+        :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
         <DataTableColumn field="name" header="Nombre"></DataTableColumn>
         <DataTableColumn field="descripcion" header="Descripción"></DataTableColumn>
         <DataTableColumn header="Maestro">
@@ -136,6 +151,8 @@ export default {
                 @click="abrirModalModificar(slotProps.data.id)"></ActionButton>
               <ActionButton label="Eliminar" icon="pi pi-trash" severity="danger"
                 @click="eliminarReservacion(slotProps.data.id)"></ActionButton>
+              <ActionButton label="Lista de Asistencia" icon="pi pi-pen-to-square" severity="succes"
+                @click="listaAsistencia(slotProps.data)"></ActionButton>
             </div>
           </template>
         </DataTableColumn>
@@ -147,6 +164,4 @@ export default {
   </div>
 </template>
 
-<style>
-
-</style>
+<style></style>

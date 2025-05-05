@@ -4,6 +4,7 @@ import IniciarSesion from '../view/IniciarSesion.vue';
 import SingIn from '../view/SingIn.vue';
 import TusReservaciones from '@/view/TusReservaciones.vue';
 import VisualizarEspacios from '@/view/VisualizarEspacios.vue';
+import ListaAsistencia from '@/view/ListaAsistencia.vue'
 
 const routes = [
   {
@@ -37,6 +38,12 @@ const routes = [
     name: 'TusReservaciones',
     component: TusReservaciones,
     meta: { requiresAuth: true, rol: 2 },
+  },
+  {
+    path: '/ListaAsistencia',
+    name: 'ListaAsistencia',
+    component: ListaAsistencia,
+    meta: { requiresAuth: true, rol: 1 },
   },
 ];
 
