@@ -1,7 +1,7 @@
 <script>
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as bootstrap from 'bootstrap';
-
+import { config } from '@/config';
 export default {
     inject: ['urlBack'],
     name: 'CrearEspacios',
@@ -37,7 +37,7 @@ export default {
             }
         },
         async crearEspacio(espacio) {
-            const response = await fetch(`${this.urlBack}/api/spaces`, {
+            const response = await fetch(`${config.API_URL}/api/spaces`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default {
             return response.json();
         },
         async crearHorario(id, start_time, end_time) {
-            const response = await fetch(`${this.urlBack}/api/schedules`, {
+            const response = await fetch(`${config.API_URL}/api/schedules`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

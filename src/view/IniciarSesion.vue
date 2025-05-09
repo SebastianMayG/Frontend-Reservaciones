@@ -38,7 +38,7 @@
 <script>
 import FloatLabel from 'primevue/floatlabel'; // Importa FloatLabel
 import InputText from 'primevue/inputtext'; // Importa InputText
-
+import { config } from '@/config';
 export default {
   inject: ['urlBack'],
   components: {
@@ -54,7 +54,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await fetch(`${this.urlBack}/api/login`, {
+        const response = await fetch(`${config.API_URL}/api/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export default {
       }
     },
     setAuthHeader(token) {
-      fetch(`${this.urlBack}/api/users`, {
+      fetch(`${config.API_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

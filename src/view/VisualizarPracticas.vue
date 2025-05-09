@@ -1,4 +1,5 @@
 <script>
+import { config } from '@/config';
 export default {
     name: 'PracticesView',
     data() {
@@ -13,7 +14,7 @@ export default {
         async fetchSignatures() {
             try {
                 this.loading = true;
-                const response = await fetch('http://localhost:8000/api/signatures', {
+                const response = await fetch(`${config.API_URL}api/signatures`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

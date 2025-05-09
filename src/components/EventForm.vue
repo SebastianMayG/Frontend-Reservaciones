@@ -2,7 +2,7 @@
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 //import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import { crearReservacion } from '@/services/reservacionService';
-
+import { config } from '@/config';
 export default {
     inject: ['urlBack'],
     name: 'CrearReservaciones',
@@ -27,7 +27,7 @@ export default {
     methods: {
         async obtenerSalas() {
             try {
-                const response = await fetch(`${this.urlBack}/api/spaces`, {
+                const response = await fetch(`${config.API_URL}/api/spaces`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default {
         },
         async obtenerReservacionesExistente(salaId, fecha) {
             try {
-                const response = await fetch(`${this.urlBack}/api/reservations/${fecha}/${salaId}`, {
+                const response = await fetch(`${config.API_URL}/api/reservations/${fecha}/${salaId}`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export default {
         },
         async obtenerHorariosSala(salaId) {
     try {
-        const response = await fetch(`${this.urlBack}/api/schedules/space/${salaId}`, {
+        const response = await fetch(`${config.API_URL}/api/schedules/space/${salaId}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
