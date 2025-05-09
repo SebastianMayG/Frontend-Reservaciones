@@ -15,7 +15,7 @@ import ActionButton from 'primevue/button';
 import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
-app.provide('urlBack', 'http://localhost:8000');
+app.provide('urlBack', 'http://localhost:8000'); //Eliminar, ahora se encuentra en config.js
 
 app.use(router);
 app.use(PrimeVue, {

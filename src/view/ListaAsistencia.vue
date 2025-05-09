@@ -1,6 +1,6 @@
 <script>
 import Toast from 'primevue/toast';
-
+import { config } from '@/config';
 export default {
   name: 'ListaAsistencia',
   components: {
@@ -40,7 +40,7 @@ export default {
       
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8000/api/assistances/reservation/${this.reservacion.id}`, {
+        const response = await fetch(`${config.API_URL}/api/assistances/reservation/${this.reservacion.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -153,7 +153,7 @@ export default {
         };
 
         // Enviar datos al backend
-        const response = await fetch('http://localhost:8000/api/assistances', {
+        const response = await fetch(`${config.API_URL}/api/assistances`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -218,7 +218,7 @@ export default {
           return;
         }
         
-        const response = await fetch(`http://localhost:8000/api/assistances/${this.assistanceId}/pdf`, {
+        const response = await fetch(`${config.API_URL}/api/assistances/${this.assistanceId}/pdf`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

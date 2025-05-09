@@ -6,7 +6,7 @@ import ModalAdminUpdate from '@/components/ModalAdminUpdate.vue';
 import DataTable from 'primevue/datatable';
 import DataTableColumn from 'primevue/column';
 import ActionButton from 'primevue/button';
-
+import { config } from '@/config';
 export default {
   inject: ['urlBack'],
   name: 'VisualizarReservas',
@@ -59,7 +59,7 @@ export default {
       if (!confirmacion) return;
 
       try {
-        const response = await fetch(`${this.urlBack}/api/reservations/${id}`, {
+        const response = await fetch(`${config.API_URL}/api/reservations/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -99,13 +99,13 @@ export default {
       }
     },
     async obtenerReservaciones() {
-      return this.fetchData(`${this.urlBack}/api/reservations`);
+      return this.fetchData(`${config.API_URL}/api/reservations`);
     },
     async obtenerSalas() {
-      return this.fetchData(`${this.urlBack}/api/spaces`);
+      return this.fetchData(`${config.API_URL}/api/spaces`);
     },
     async obtenerMaestros() {
-      return this.fetchData(`${this.urlBack}/api/users`);
+      return this.fetchData(`${config.API_URL}/api/users`);
     },
     async fetchData(url) {
       try {

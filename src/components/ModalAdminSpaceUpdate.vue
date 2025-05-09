@@ -1,6 +1,6 @@
 <script>
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
+import {config} from '@/config';
 export default {
     inject: ['urlBack'],
     name: 'ModalAdminSpaceUpdate',
@@ -42,7 +42,7 @@ export default {
             }
         },
         async actualizarEspacio(espacio) {
-            const response = await fetch(`${this.urlBack}/api/spaces/${espacio.id}`, {
+            const response = await fetch(`${config.API_URL}/api/spaces/${espacio.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default {
             return response.json();
         },
         async actualizarHorario(id, start_time, end_time) {
-            const response = await fetch(`${this.urlBack}/api/schedules/${id}`, {
+            const response = await fetch(`${config.API_URL}/api/schedules/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default {
             }
         },
         async obtenerEspacio(id) {
-            const responseEspacio = await fetch(`${this.urlBack}/api/spaces/${id}`, {
+            const responseEspacio = await fetch(`${config.API_URL}/api/spaces/${id}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export default {
             return responseEspacio.json();
         },
         async obtenerEspacioHorario(id) {
-            const responseEspacioHorario = await fetch(`${this.urlBack}/api/schedules/space/${id}`, {
+            const responseEspacioHorario = await fetch(`${config.API_URL}/api/schedules/space/${id}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',

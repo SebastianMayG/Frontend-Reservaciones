@@ -11,7 +11,7 @@ import ModifyEventForm from '@/components/ModifyEventForm.vue';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import { getReservations } from '@/services/getReservations';
-
+import { config } from '@/config';
 export default {
     inject: ['urlBack'],
     components: {
@@ -94,7 +94,7 @@ export default {
         },
         async obtenerSalas() {
             try {
-                const response = await fetch(`${this.urlBack}/api/spaces`, {
+                const response = await fetch(`${config.API_URL}/api/spaces`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',

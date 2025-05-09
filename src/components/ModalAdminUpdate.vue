@@ -2,6 +2,7 @@
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min';
 import { actualizarReservacion } from '@/services/UpdateService';
+import { config } from '@/config';
 
 export default {
     inject: ['urlBack'],
@@ -40,7 +41,7 @@ export default {
     methods: {
         async obtenerSalas() {
             try {
-                const response = await fetch(`${this.urlBack}/api/spaces`, {
+                const response = await fetch(`${config.API_URL}/api/spaces`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ export default {
         },
         async obtenerMaestros() {
             try {
-                const response = await fetch(`${this.urlBack}/api/users`, {
+                const response = await fetch(`${config.API_URL}/api/users`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ export default {
         },
         async obtenerMaestrosAll() {
             try {
-                const response = await fetch(`${this.urlBack}/api/users`, {
+                const response = await fetch(`${config.API_URL}/api/users`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -129,7 +130,7 @@ export default {
         },
         async obtenerReservacionesExistente(salaId, fecha) {
             try {
-                const response = await fetch(`${this.urlBack}/api/reservations/${fecha}/${salaId}`, {
+                const response = await fetch(`${config.API_URL}/api/reservations/${fecha}/${salaId}`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export default {
         },
         async obtenerHorariosSala(salaId) {
             try {
-                const response = await fetch(`${this.urlBack}/api/schedules/space/${salaId}`, {
+                const response = await fetch(`${config.API_URL}/api/schedules/space/${salaId}`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
@@ -257,7 +258,7 @@ export default {
             if (this.reservacionId) {
                 try {
                     // 1. Obtener los datos de la reservación
-                    const responseReservacion = await fetch(`${this.urlBack}/api/reservations/${this.reservacionId}`, {
+                    const responseReservacion = await fetch(`${config.API_URL}/api/reservations/${this.reservacionId}`, {
                         method: "GET",
                         headers: {
                             'Content-Type': 'application/json',
@@ -273,7 +274,7 @@ export default {
                     const reservacion = dataReservacion.data;
 
                     // 2. Obtener los detalles de la sala usando el space_id
-                    const responseSala = await fetch(`${this.urlBack}/api/spaces/${reservacion.space_id}`, {
+                    const responseSala = await fetch(`${config.API_URL}/api/spaces/${reservacion.space_id}`, {
                         method: "GET",
                         headers: {
                             'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import DataTableColumn from 'primevue/column';
 import ActionButton from 'primevue/button';
 import ModalAdminEspacios from '@/components/ModalAdminEspacios.vue';
 import ModalAdminSpaceUpdate from '@/components/ModalAdminSpaceUpdate.vue';
-
+import { config } from '@/config';
 export default {
     inject: ['urlBack'],
     name: 'VisualizarEspacios',
@@ -74,7 +74,7 @@ export default {
             if (!confirmacion) return;
 
             try {
-                const response = await fetch(`${this.urlBack}/api/spaces/${id}`, {
+                const response = await fetch(`${config.API_URL}/api/spaces/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -89,10 +89,10 @@ export default {
             }
         },
         async obtenerSalas() {
-            return this.fetchData(`${this.urlBack}/api/spaces`);
+            return this.fetchData(`${config.API_URL}/api/spaces`);
         },
         async obtenerHorarios() {
-            return this.fetchData(`${this.urlBack}/api/schedules`);
+            return this.fetchData(`${config.API_URL}/api/schedules`);
         },
         async fetchData(url) {
             try {

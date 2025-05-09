@@ -1,10 +1,9 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router';
 import { computed } from 'vue';
-import { inject } from 'vue'
+import { config } from '@/config';
 
 const router = useRouter();
-const urlBack = inject('urlBack') // Inyecta la variable
 const isLoggedIn = computed(() => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('token');
@@ -20,7 +19,7 @@ const logout = async () => {
   }
 
   try {
-    const response = await fetch(`${urlBack}/api/logout`, {
+    const response = await fetch(`${config.API_URL}/api/logout`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

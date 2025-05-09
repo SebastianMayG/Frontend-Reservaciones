@@ -56,7 +56,7 @@
 import FloatLabel from 'primevue/floatlabel'; // Importa FloatLabel
 import InputText from 'primevue/inputtext'; // Importa InputText
 import Message from 'primevue/message';
-
+import { config } from '@/config'; // Asegúrate de que la ruta sea correcta
 export default {
     inject: ['urlBack'],
     components: {
@@ -77,7 +77,7 @@ export default {
     },
     methods: {
         setAuthHeader(token) {
-            fetch(`${this.urlBack}/api/users`, {
+            fetch(`${config.API_URL}/api/users`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -95,7 +95,7 @@ export default {
 
             // 2. El resto de tu código EXACTAMENTE igual
             try {
-                const response = await fetch(`${this.urlBack}/api/register`, {
+                const response = await fetch(`${config.API_URL}/api/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
