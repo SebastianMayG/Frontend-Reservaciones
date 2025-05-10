@@ -14,7 +14,7 @@ export default {
         async fetchSignatures() {
             try {
                 this.loading = true;
-                const response = await fetch(`${config.API_URL}api/signatures`, {
+                const response = await fetch(`${config.API_URL}/api/signatures`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
