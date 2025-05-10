@@ -1,13 +1,20 @@
 <script>
 import Toast from 'primevue/toast';
 import { config } from '@/config';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
 export default {
   name: 'ListaAsistencia',
   components: {
-    Toast
+    Toast,
+    Dialog,
+    Button
   },
   data() {
     return {
+      showImportModal: false,  // Mover esto aquí
+      selectedFile: false,
+      importLoading: false,
       reservacion: {
         id: null,
         sala_name: '',
@@ -27,7 +34,8 @@ export default {
       assistanceId: null,
       pdfLoading: false,
       listaGuardada: false,
-      listaExistente: false
+      listaExistente: false,
+
     };
   },
   created() {
@@ -247,6 +255,89 @@ export default {
 
     guardarLista() {
       this.enviarAsistencia();
+    },
+    openImportModal() {
+      this.showImportModal = true;
+    },
+
+    handleFileUpload(event) {
+      if (!event.target || !event.target.files || event.target.files.length === 0) {
+        console.error("No se seleccionó ningún archivo");
+        return;
+      }
+
+      // Asigna el PRIMER archivo (no solo la referencia)
+      this.selectedFile = new File(
+        [event.target.files[0]],
+        event.target.files[0].name,
+        { type: event.target.files[0].type }
+      );
+
+      console.log("Archivo procesado:", this.selectedFile);
+    },
+    async importList() {
+      if (!this.selectedFile) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Archivo requerido',
+          detail: 'Debes seleccionar un archivo CSV',
+          life: 5000
+        });
+        return;
+      }
+
+      this.importLoading = true;
+
+      try {
+        const formData = new FormData();
+        const startTime = this.reservacion.reservation.split(' - ')[0].trim();
+        const fullTime = startTime.split(':').length === 2 ? `${startTime}:00` : startTime;
+        const dateForBackend = `${this.reservacion.date}T${fullTime}.00`;
+
+        formData.append('file', this.selectedFile);
+        formData.append('reservationId', this.reservacion.id);
+        formData.append('dateAssistance', dateForBackend);
+
+        const response = await fetch(`${config.API_URL}/api/assistances/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Accept': 'application/json' // Asegura que esperamos JSON
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+
+
+        this.alumnos = data.students?.map(id => ({ matricula: id, nombre: '', focus: false })) || [];
+        this.listaExistente = true;
+        this.assistanceId = data.assistanceId;
+        this.listaGuardada = true;
+
+        await this.generarPDF();
+
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Importación exitosa',
+          detail: 'Lista importada y PDF generado correctamente',
+          life: 5000
+        });
+
+        this.showImportModal = false;
+      } catch (error) {
+        console.error('Error completo:', error);
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Error en importación',
+          detail: error.message.includes('JSON')
+            ? 'Error en el formato de respuesta del servidor'
+            : error.message,
+          life: 5000
+        });
+      } finally {
+        this.importLoading = false;
+      }
     }
   }
 };
@@ -283,9 +374,13 @@ export default {
         <input type="text" id="reservation" v-model="reservacion.reservation" disabled>
       </div>
     </div>
-
     <div class="asistencia-section">
-      <b>Asistencia</b>
+      <div style="display: flex;">
+        <b style="margin-right: 31rem;">Asistencia</b>
+        <button @click="openImportModal" class="btn-importar" v-if="!listaExistente">
+          <i class="pi pi-upload"></i> Importar lista
+        </button>
+      </div>
       <div v-if="listaExistente" class="lista-existente-message">
         <p>Ya se ha generado una lista de asistencia para esta reservación.</p>
         <p>Puedes generar el PDF nuevamente si lo necesitas.</p>
@@ -304,6 +399,18 @@ export default {
         </div>
       </div>
 
+      <Dialog v-model:visible="showImportModal" header="Importar lista de estudiantes" :modal="true"
+        :style="{ width: '500px' }">
+        <div class="p-field">
+          <label for="csvFile">Seleccione archivo CSV:</label>
+          <input id="csvFile" type="file" accept=".csv" @change="handleFileUpload" class="p-inputtext p-component">
+        </div>
+        <template #footer>
+          <Button label="Cancelar" icon="pi pi-times" @click="showImportModal = false" class="p-button-text" />
+          <Button label="Importar" icon="pi pi-check" @click="importList" :loading="importLoading" />
+        </template>
+      </Dialog>
+
       <div class="action-buttons">
         <button @click="agregarAlumno" class="btn-agregar" v-if="!listaExistente">
           + Agregar Alumno
@@ -315,6 +422,7 @@ export default {
           {{ pdfLoading ? 'Generando...' : '📄 Generar PDF' }}
         </button>
       </div>
+
     </div>
   </div>
 </template>
@@ -448,5 +556,44 @@ input:disabled {
   border-radius: 4px;
   margin-bottom: 15px;
   border-left: 4px solid #ffc107;
+}
+
+.asistencia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.btn-importar {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-importar:hover {
+  background: #218838;
+}
+
+.btn-importar i {
+  font-size: 14px;
+}
+
+.import-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.file-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 </style>
