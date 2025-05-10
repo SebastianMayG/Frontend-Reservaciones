@@ -4,38 +4,40 @@
       <!-- Logo y título -->
       <div class="logo-container">
         <img :src="require('@/assets/schoolBooker.png')" alt="ClassBooker Logo" class="logo">
-        <h1 class="app-title">Regístrate en ClassBooker</h1>
-        <p class="app-subtitle">Crea tu cuenta para gestionar tus reservas</p>
+        <h1 class="app-title">ClassBooker</h1>
+        <p class="app-subtitle">Crea tu cuenta para gestionar reservas</p>
       </div>
 
       <!-- Formulario -->
       <form @submit.prevent="registerUser" class="register-form">
-        <div class="input-container">
-          <div class="icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+        <div class="input-group">
+          <div class="input-container">
+            <div class="icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <FloatLabel variant="in" class="w-100">
+              <InputText id="name" v-model="form.name" class="w-100 input-field" required />
+              <label for="name">Nombre</label>
+            </FloatLabel>
           </div>
-          <FloatLabel variant="in" class="w-100">
-            <InputText id="name" v-model="form.name" class="w-100 input-field" required />
-            <label for="name">Nombre</label>
-          </FloatLabel>
-        </div>
 
-        <div class="input-container">
-          <div class="icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
+          <div class="input-container">
+            <div class="icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <FloatLabel variant="in" class="w-100">
+              <InputText id="last_name" v-model="form.last_name" class="w-100 input-field" required />
+              <label for="last_name">Apellido</label>
+            </FloatLabel>
           </div>
-          <FloatLabel variant="in" class="w-100">
-            <InputText id="last_name" v-model="form.last_name" class="w-100 input-field" required />
-            <label for="last_name">Apellido</label>
-          </FloatLabel>
         </div>
 
         <div class="input-container email-input" :class="{'has-error': emailError}">
@@ -70,7 +72,7 @@
         </div>
 
         <button class="register-button" type="submit">
-          Crear cuenta
+          Registrarse
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
@@ -87,6 +89,7 @@
     <div class="register-background">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
     </div>
   </div>
 </template>
@@ -124,16 +127,15 @@ export default {
       });
     },
     async registerUser() {
-      // 1. Validación del email con PrimeVue Message
+      // Validación del email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.form.email)) {
         this.emailError = 'Ingrese un correo válido (ej: usuario@dominio.com)';
-        return; // Detiene la ejecución
+        return;
       } else {
-        this.emailError = ''; // Limpia el error si es válido
+        this.emailError = '';
       }
 
-      // 2. Registro del usuario
       try {
         const response = await fetch(`${config.API_URL}/api/register`, {
           method: 'POST',
@@ -158,18 +160,13 @@ export default {
           localStorage.setItem('id', data.data.id);
 
           this.setAuthHeader(token);
-          if (localStorage.getItem('rol') == 1) {
-            this.$router.push('/VisualizarReservas');
-          } else {
-            this.$router.push('/TusReservaciones');
-          }
+          this.$router.push('/TusReservaciones');
         } else {
-          this.emailError = data.message || 'Error al registrarse.'; // Usamos Message aquí también
-          console.log(data.errors);
+          this.emailError = data.message || 'Error al registrarse.';
         }
       } catch (error) {
         console.error('Error al registrarte:', error);
-        this.emailError = 'Error al registrarse. Intente nuevamente.'; // Usamos Message para errores
+        this.emailError = 'Error al registrarse. Intente nuevamente.';
       }
     }
   }
@@ -182,21 +179,22 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
   position: relative;
   overflow: hidden;
 }
 
 .register-card {
   width: 100%;
-  max-width: 450px;
+  max-width: 480px;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(93, 63, 211, 0.2);
   padding: 40px;
   z-index: 1;
   position: relative;
   animation: fadeIn 0.6s ease-out;
+  border: 1px solid rgba(106, 13, 173, 0.1);
 }
 
 .logo-container {
@@ -210,48 +208,62 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 16px;
-  border: 3px solid #e9ecef;
+  border: 3px solid #D1C4E9;
+  box-shadow: 0 4px 8px rgba(106, 13, 173, 0.1);
 }
 
 .app-title {
   font-size: 24px;
   font-weight: 700;
-  color: #265A9C;
+  background: linear-gradient(135deg, #6A0DAD 0%, #5D3FD3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin-bottom: 8px;
 }
 
 .app-subtitle {
   font-size: 14px;
-  color: #6c757d;
+  color: #7E57C2;
   margin-bottom: 0;
 }
 
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  gap: 15px;
+}
+
+.input-group .input-container {
+  flex: 1;
 }
 
 .input-container {
   display: flex;
   align-items: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid #D1C4E9;
   border-radius: 8px;
   transition: all 0.3s ease;
   padding-left: 12px;
+  background-color: #F5F5FF;
   position: relative;
 }
 
 .input-container:focus-within {
-  border-color: #265A9C;
-  box-shadow: 0 0 0 3px rgba(38, 90, 156, 0.1);
+  border-color: #7E57C2;
+  box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.2);
 }
 
 .icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6c757d;
+  color: #7E57C2;
   margin-right: 8px;
 }
 
@@ -260,15 +272,15 @@ export default {
   height: 48px;
   flex-grow: 1;
   padding-left: 0 !important;
+  background-color: transparent !important;
 }
 
 .input-field:focus {
   box-shadow: none !important;
 }
 
-
 .email-input.has-error {
-  margin-bottom: 4.2rem; 
+  margin-bottom: 4.2rem;
   border-color: #ffb4b4;
 }
 
@@ -284,13 +296,14 @@ export default {
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #ffb4b4;
+  color: #ff5252;
 }
 
 .register-button {
-  background-color: #265A9C;
+  background: linear-gradient(135deg, #6A0DAD 0%, #5D3FD3 100%);
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 14px 24px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -300,11 +313,12 @@ export default {
   gap: 8px;
   transition: all 0.3s ease;
   margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(93, 63, 211, 0.2);
 }
 
 .register-button:hover {
-  background-color: #1d4b7e;
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(93, 63, 211, 0.3);
 }
 
 .register-button svg {
@@ -319,20 +333,38 @@ export default {
   text-align: center;
   margin-top: 16px;
   font-size: 14px;
-  color: #6c757d;
+  color: #7E57C2;
 }
 
 .link {
-  color: #265A9C;
+  color: #5D3FD3;
   font-weight: 600;
   text-decoration: none;
   margin-left: 5px;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .link:hover {
-  color: #1d4b7e;
-  text-decoration: underline;
+  color: #6A0DAD;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #5D3FD3 0%, #6A0DAD 100%);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .register-background {
@@ -347,7 +379,7 @@ export default {
 .shape {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(38, 90, 156, 0.1) 0%, rgba(38, 90, 156, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(106, 13, 173, 0.1) 0%, rgba(93, 63, 211, 0.05) 100%);
 }
 
 .shape-1 {
@@ -364,7 +396,14 @@ export default {
   left: -50px;
 }
 
-/* Animaciones */
+.shape-3 {
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  right: 10%;
+  opacity: 0.7;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -384,21 +423,22 @@ export default {
   transform: translateY(-10px);
 }
 
-/* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .register-card {
     padding: 30px 20px;
     margin: 0 15px;
+    max-width: 100%;
   }
   
   .app-title {
     font-size: 20px;
   }
   
-  .app-subtitle {
-    font-size: 13px;
+  .input-group {
+    flex-direction: column;
+    gap: 20px;
   }
-
+  
   .email-input.has-error {
     margin-bottom: 2rem;
   }

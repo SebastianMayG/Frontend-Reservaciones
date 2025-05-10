@@ -127,7 +127,7 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
   position: relative;
   overflow: hidden;
 }
@@ -137,11 +137,12 @@ export default {
   max-width: 420px;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(93, 63, 211, 0.2);
   padding: 40px;
   z-index: 1;
   position: relative;
   animation: fadeIn 0.6s ease-out;
+  border: 1px solid rgba(106, 13, 173, 0.1);
 }
 
 .logo-container {
@@ -155,19 +156,23 @@ export default {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 16px;
-  border: 3px solid #e9ecef;
+  border: 3px solid #D1C4E9;
+  box-shadow: 0 4px 8px rgba(106, 13, 173, 0.1);
 }
 
 .app-title {
   font-size: 24px;
   font-weight: 700;
-  color: #265A9C;
-  margin-bottom: 4px;
+  background: linear-gradient(135deg, #6A0DAD 0%, #5D3FD3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
 }
 
 .app-subtitle {
   font-size: 14px;
-  color: #6c757d;
+  color: #7E57C2;
   margin-bottom: 0;
 }
 
@@ -180,22 +185,23 @@ export default {
 .input-container {
   display: flex;
   align-items: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid #D1C4E9;
   border-radius: 8px;
   transition: all 0.3s ease;
   padding-left: 12px;
+  background-color: #F5F5FF;
 }
 
 .input-container:focus-within {
-  border-color: #265A9C;
-  box-shadow: 0 0 0 3px rgba(38, 90, 156, 0.1);
+  border-color: #7E57C2;
+  box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.2);
 }
 
 .icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6c757d;
+  color: #7E57C2;
   margin-right: 8px;
 }
 
@@ -204,6 +210,7 @@ export default {
   height: 48px;
   flex-grow: 1;
   padding-left: 0 !important;
+  background-color: transparent !important;
 }
 
 .input-field:focus {
@@ -211,10 +218,10 @@ export default {
 }
 
 .login-button {
-  background-color: #265A9C;
+  background: linear-gradient(135deg, #6A0DAD 0%, #5D3FD3 100%);
   color: white;
   border: none;
-  padding: 12px 20px;
+  padding: 14px 24px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -224,11 +231,12 @@ export default {
   gap: 8px;
   transition: all 0.3s ease;
   margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(93, 63, 211, 0.2);
 }
 
 .login-button:hover {
-  background-color: #1d4b7e;
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(93, 63, 211, 0.3);
 }
 
 .login-button svg {
@@ -243,20 +251,38 @@ export default {
   text-align: center;
   margin-top: 16px;
   font-size: 14px;
-  color: #6c757d;
+  color: #7E57C2;
 }
 
 .link {
-  color: #265A9C;
+  color: #5D3FD3;
   font-weight: 600;
   text-decoration: none;
   margin-left: 5px;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .link:hover {
-  color: #1d4b7e;
-  text-decoration: underline;
+  color: #6A0DAD;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #5D3FD3 0%, #6A0DAD 100%);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .login-background {
@@ -271,7 +297,7 @@ export default {
 .shape {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(38, 90, 156, 0.1) 0%, rgba(38, 90, 156, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(106, 13, 173, 0.1) 0%, rgba(93, 63, 211, 0.05) 100%);
 }
 
 .shape-1 {
@@ -303,6 +329,14 @@ export default {
   .login-card {
     padding: 30px 20px;
     margin: 0 15px;
+  }
+  
+  .app-title {
+    font-size: 20px;
+  }
+  
+  .login-button {
+    padding: 12px 20px;
   }
 }
 </style>

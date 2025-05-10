@@ -128,7 +128,7 @@ const logout = async () => {
 
 <style scoped>
 .admin-navbar {
-  background-color: #265A9C;
+  background-color: #7E57C2;
   padding: 0.8rem 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -285,7 +285,7 @@ const logout = async () => {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #265A9C;
+    background-color: #7E57C2;
     flex-direction: column;
     align-items: flex-start;
     padding: 1rem;
