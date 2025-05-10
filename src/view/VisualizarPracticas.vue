@@ -1,61 +1,126 @@
 <script>
 import { config } from '@/config';
+import PracticeFormModal from '@/components/PracticeForm.vue'
+
 export default {
     name: 'PracticesView',
+    components: {
+        PracticeFormModal
+    },
     data() {
         return {
             signatures: [],
             loading: true,
             error: null,
-            openAccordions: new Set()
+            openAccordions: new Set(),
+            showPracticeModal: false,
+            // Nuevas propiedades para el diálogo
+            showConfirmDialog: false,
+            practiceToDelete: null,
+            dialogTitle: 'Eliminar práctica',
+            dialogMessage: '¿Estás seguro de que quieres eliminar esta práctica? Esta acción no se puede deshacer.'
         }
     },
     methods: {
         async fetchSignatures() {
             try {
-                this.loading = true;
+                this.loading = true
                 const response = await fetch(`${config.API_URL}/api/signatures`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
-                });
-                if (!response.ok) throw new Error('Error al cargar las materias');
-                this.signatures = await response.json();
+                })
+                if (!response.ok) throw new Error('Error al cargar las materias')
+                this.signatures = await response.json()
             } catch (err) {
-                this.error = err.message;
+                this.error = err.message
             } finally {
-                this.loading = false;
+                this.loading = false
             }
         },
         toggleAccordion(id) {
             if (this.openAccordions.has(id)) {
-                this.openAccordions.delete(id);
+                this.openAccordions.delete(id)
             } else {
-                this.openAccordions.add(id);
+                this.openAccordions.add(id)
             }
         },
         isOpen(id) {
-            return this.openAccordions.has(id);
+            return this.openAccordions.has(id)
         },
         formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' }
+            return new Date(dateString).toLocaleDateString('es-ES', options)
         },
         openAddPracticeModal() {
-            // Implementar lógica para abrir modal de agregar práctica
-            console.log('Abrir modal para agregar práctica');
+            this.showPracticeModal = true
+        },
+        handlePracticeCreated(newPractice) {
+            const signature = this.signatures.find(s => s.id === newPractice.signature.id)
+            if (signature) {
+                if (!signature.practices) signature.practices = []
+                signature.practices.push(newPractice)
+            }
+        },
+        confirmDelete(practiceId) {
+            this.practiceToDelete = practiceId
+            this.showConfirmDialog = true
+        },
+        async deletePractice() {
+            try {
+                const response = await fetch(`${config.API_URL}/api/practices/${this.practiceToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+                
+                if (!response.ok) throw new Error('Error al eliminar la práctica')
+                
+                this.signatures.forEach(signature => {
+                    if (signature.practices) {
+                        signature.practices = signature.practices.filter(p => p.id !== this.practiceToDelete)
+                    }
+                })
+                
+            } catch (err) {
+                this.error = err.message
+            } finally {
+                this.showConfirmDialog = false
+                this.practiceToDelete = null
+            }
+        },
+        cancelDelete() {
+            this.showConfirmDialog = false
+            this.practiceToDelete = null
         }
     },
     mounted() {
-        this.fetchSignatures();
+        this.fetchSignatures()
     }
 }
 </script>
+
 <template>
     <div class="practices-container">
         <div class="header">
             <button class="add-button" @click="openAddPracticeModal">+ Agregar Práctica</button>
             <h1>Administración de Prácticas</h1>
+        </div>
+
+        <PracticeFormModal v-model="showPracticeModal" :signatures="signatures"
+            @practice-created="handlePracticeCreated" />
+        
+        <!-- Diálogo de confirmación -->
+        <div v-if="showConfirmDialog" class="confirm-dialog-overlay">
+            <div class="confirm-dialog">
+                <h3>{{ dialogTitle }}</h3>
+                <p>{{ dialogMessage }}</p>
+                <div class="dialog-buttons">
+                    <button @click="cancelDelete" class="cancel-button">Cancelar</button>
+                    <button @click="deletePractice" class="confirm-button">Eliminar</button>
+                </div>
+            </div>
         </div>
 
         <div v-if="loading" class="loading">Cargando materias...</div>
@@ -67,7 +132,7 @@ export default {
                     <span class="toggle-icon">{{ isOpen(signature.id) ? '−' : '+' }}</span>
                 </button>
                 <div class="accordion-content" :class="{ 'open': isOpen(signature.id) }">
-                    <div v-if="signature.practices.length === 0" class="no-practices">
+                    <div v-if="!signature.practices || signature.practices.length === 0" class="no-practices">
                         No hay prácticas registradas para esta materia
                     </div>
                     <div v-else>
@@ -78,6 +143,11 @@ export default {
                             </div>
                             <div class="practice-meta">
                                 <span>Creada: {{ formatDate(practice.create_at) }}</span>
+                                <button class="delete-button" @click.stop="confirmDelete(practice.id)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -86,6 +156,7 @@ export default {
         </div>
     </div>
 </template>
+
 <style scoped>
 .practices-container {
     max-width: 1000px;
@@ -189,6 +260,8 @@ h1 {
 }
 
 .practice-meta {
+    display: flex;
+    align-items: center;
     color: #7f8c8d;
     font-size: 0.8em;
 }
@@ -208,5 +281,90 @@ h1 {
 
 .error {
     color: #e74c3c;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+/* Estilos para el diálogo de confirmación */
+.confirm-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.confirm-dialog {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-dialog h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.confirm-dialog p {
+    margin-bottom: 20px;
+    color: #34495e;
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-button {
+    background-color: #f1f1f1;
+    color: #333;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
+.confirm-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.confirm-button:hover {
+    background-color: #c0392b;
 }
 </style>
