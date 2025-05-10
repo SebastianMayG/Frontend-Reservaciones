@@ -37,7 +37,7 @@ export default {
   methods: {
     async verificarListaExistente() {
       if (!this.reservacion.id) return;
-      
+
       try {
         const token = localStorage.getItem('token');
         const response = await fetch(`${config.API_URL}/api/assistances/reservation/${this.reservacion.id}`, {
@@ -203,7 +203,7 @@ export default {
       }
 
       this.pdfLoading = true;
-      
+
       try {
         // Obtener el token del localStorage
         const token = localStorage.getItem('token');
@@ -217,7 +217,7 @@ export default {
           });
           return;
         }
-        
+
         const response = await fetch(`${config.API_URL}/api/assistances/${this.assistanceId}/pdf`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -297,10 +297,6 @@ export default {
             <input :id="'matricula-' + index" type="number" v-model.number="alumno.matricula" class="matricula-input"
               @keydown.tab="manejarTab(index, $event)" @keyup.enter="agregarAlumno" :ref="'matricula-' + index"
               :autofocus="alumno.focus">
-          </div>
-          <div class="form-group">
-            <label :for="'nombre-' + index">Nombre (opcional)</label>
-            <input :id="'nombre-' + index" type="text" v-model="alumno.nombre" @keyup.enter="agregarAlumno">
           </div>
           <button @click="eliminarAlumno(index)" class="btn-eliminar" v-if="alumnos.length > 1">
             ×
