@@ -128,7 +128,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="mb-4">
     <div class="d-flex justify-content-end mb-3 m-4">
       <ActionButton icon="pi pi-check" label="Crear Reservación" severity="info" @click="abrirModal"></ActionButton>
     </div>

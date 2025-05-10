@@ -126,8 +126,8 @@ export default {
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
-                const data = await response.json();
-                console.log("Reservación eliminada:", data);
+                // const data = await response.json();
+                // console.log("Reservación eliminada:", data);
                 // Opcional: Mostrar alerta de éxito
                 alert("Reservación eliminada con éxito");
                 // Recargar la página o actualizar la lista de reservaciones
@@ -151,7 +151,7 @@ export default {
                 }
 
                 const data = await response.json();
-                console.log("Horarios de la sala ", salaId, ": ", data.data);
+                // console.log("Horarios de la sala ", salaId, ": ", data.data);
 
                 // Dividir el horario en intervalos de 2 horas
                 const horariosDivididos = this.dividirHorario(data.data);
@@ -240,7 +240,7 @@ export default {
                 }
 
                 const data = await response.json();
-                console.log("Reservación obtenida:", data);
+                // console.log("Reservación obtenida:", data);
 
                 // Asignar los valores a las propiedades del componente
                 this.fechaReservacion = data.data.date || '';

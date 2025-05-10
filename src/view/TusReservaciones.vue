@@ -245,7 +245,7 @@ export default {
 }
 
 .calendar-header h2 {
-    color: #265A9C;
+    color: #7E57C2;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
