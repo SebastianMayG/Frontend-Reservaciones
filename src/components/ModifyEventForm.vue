@@ -2,7 +2,14 @@
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { actualizarReservacion } from '@/services/UpdateService';
 import { config } from '@/config';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+
 export default {
+    components: {
+        Dialog,
+        Button
+    },
     inject: ['urlBack'],
     name: 'ModifyEventForm',
     props: {
@@ -15,6 +22,16 @@ export default {
             selectedHour: null,
             selectedTitle: null,
             reservacionId: null,
+            // Estados para los diálogos
+            showDeleteDialog: false,
+            showResultDialog: false,
+            dialogData: {
+                title: '',
+                message: '',
+                icon: ''
+            },
+            reservationToDelete: null,
+            // Resto de tus datos existentes
             reservacionData: {
                 nameSala: "",
                 descripcion: '',
@@ -138,6 +155,14 @@ export default {
             } catch (error) {
                 console.error('Error al guardar la reservación:', error);
             }
+        },
+        showResult(title, message, icon) {
+            this.dialogData = { title, message, icon };
+            this.showResultDialog = true;
+        },
+        closeResultDialog() {
+            this.showResultDialog = false;
+            window.location.reload();
         },
         async obtenerHorariosSala(salaId) {
             try {
@@ -358,4 +383,46 @@ export default {
             </div>
         </div>
     </div>
+
+    <!-- Diálogo de Confirmación -->
+    <Dialog v-model:visible="showDeleteDialog" :header="dialogData.title" :style="{ width: '15vw' }" :modal="true">
+        <div class="center">
+            <i :class="dialogData.icon" style="font-size: 2rem"></i>
+        </div>
+        <div class="flex align-items-center gap-3">
+            <span>{{ dialogData.message }}</span>
+        </div>
+        <template #footer>
+            <Button label="Cancelar" icon="pi pi-times" @click="showDeleteDialog = false" class="p-button-text" />
+            <Button label="Eliminar" icon="pi pi-trash" @click="confirmDelete" severity="danger" autofocus />
+        </template>
+    </Dialog>
+
+    <!-- Diálogo de Resultado -->
+    <Dialog v-model:visible="showResultDialog" :header="dialogData.title" :style="{ width: '350px' }" :modal="true">
+        <div class="center">
+            <i :class="dialogData.icon" style="font-size: 2rem"></i>
+        </div>
+        <div class="flex align-items-center gap-3">
+            <span>{{ dialogData.message }}</span>
+        </div>
+        <template #footer>
+            <Button label="Aceptar" icon="pi pi-check" @click="closeResultDialog" autofocus />
+        </template>
+    </Dialog>
 </template>
+
+<style scoped>
+.text-red-500 {
+    color: #ef4444;
+}
+
+.text-green-500 {
+    color: #22c55e;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+</style>
