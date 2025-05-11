@@ -107,14 +107,21 @@ export default {
         },
         async eliminarReservacion(id) {
             if (!id) {
-                console.error("Error: El ID de la reservación es undefined");
+                this.showResult('Error', 'El ID de la reservación es inválido', 'pi pi-times-circle text-red-500');
                 return;
             }
-            // Mostrar alerta de confirmación
-            const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
-            if (!confirmacion) {
-                return; // Si el usuario cancela, no se ejecuta la eliminación
-            }
+
+            this.reservationToDelete = id;
+            this.dialogData = {
+                title: 'Confirmar eliminación',
+                message: '¿Estás seguro de que quieres eliminar esta reservación?',
+                icon: 'pi pi-exclamation-triangle'
+            };
+            this.showDeleteDialog = true;
+        },
+        async confirmDelete() {
+            this.showDeleteDialog = false;
+
             try {
                 const response = await fetch(`${config.API_URL}/api/reservations/${id}`, {
                     method: 'DELETE',
@@ -126,12 +133,8 @@ export default {
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
-                // const data = await response.json();
-                // console.log("Reservación eliminada:", data);
-                // Opcional: Mostrar alerta de éxito
-                alert("Reservación eliminada con éxito");
-                // Recargar la página o actualizar la lista de reservaciones
-                window.location.reload();
+
+                this.showResult('Éxito', 'Reservación eliminada con éxito', 'pi pi-check-circle text-green-500');
             } catch (error) {
                 console.error('Error al guardar la reservación:', error);
             }
