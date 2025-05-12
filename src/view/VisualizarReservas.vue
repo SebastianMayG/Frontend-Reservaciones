@@ -6,7 +6,10 @@ import ModalAdminUpdate from '@/components/ModalAdminUpdate.vue';
 import DataTable from 'primevue/datatable';
 import DataTableColumn from 'primevue/column';
 import ActionButton from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
 import { config } from '@/config';
+
 export default {
   inject: ['urlBack'],
   name: 'VisualizarReservas',
@@ -15,12 +18,22 @@ export default {
     ModalAdminUpdate,
     DataTable,
     DataTableColumn,
-    ActionButton
+    ActionButton,
+    Dialog,
+    Button
   },
   data() {
     return {
       reservaciones: [],
       reservacionId: null,
+      showDeleteDialog: false,
+      showResultDialog: false,
+      dialogData: {
+        title: '',
+        message: '',
+        icon: ''
+      },
+      reservationToDelete: null,
     };
   },
   mounted() {
@@ -52,26 +65,45 @@ export default {
     },
     async eliminarReservacion(id) {
       if (!id) {
-        console.error("Error: El ID de la reservación es undefined");
+        this.showResult('Error', 'El ID de la reservación es inválido', 'pi pi-times-circle text-red-500');
         return;
       }
-      const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar esta reservación?");
-      if (!confirmacion) return;
+
+      this.reservationToDelete = id;
+      this.dialogData = {
+        title: 'Confirmar eliminación',
+        message: '¿Estás seguro de que quieres eliminar esta reservación?',
+        icon: 'pi pi-exclamation-triangle'
+      };
+      this.showDeleteDialog = true;
+    },
+    async confirmDelete() {
+      this.showDeleteDialog = false;
 
       try {
-        const response = await fetch(`${config.API_URL}/api/reservations/${id}`, {
+        const response = await fetch(`${config.API_URL}/api/reservations/${this.reservationToDelete}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-        alert("Reservación eliminada con éxito");
-        this.cargarDatos();
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        this.showResult('Éxito', 'Reservación eliminada con éxito', 'pi pi-check-circle text-green-500');
+        this.cargarDatos(); // Recargar los datos después de eliminar
       } catch (error) {
-        console.error('Error al eliminar la reservación:', error.message);
-        alert("Error al eliminar la reservación");
+        console.error('Error al eliminar la reservación:', error);
+        this.showResult('Error', 'No se pudo eliminar la reservación', 'pi pi-times-circle text-red-500');
       }
+    },
+    showResult(title, message, icon) {
+      this.dialogData = { title, message, icon };
+      this.showResultDialog = true;
+    },
+    closeResultDialog() {
+      this.showResultDialog = false;
     },
     async cargarDatos() {
       try {
@@ -95,7 +127,7 @@ export default {
         });
       } catch (error) {
         console.error('Error al cargar los datos:', error.message);
-        alert("Error al cargar los datos. Inténtalo de nuevo más tarde.");
+        this.showResult('Error', 'Error al cargar los datos', 'pi pi-times-circle text-red-500');
       }
     },
     async obtenerReservaciones() {
@@ -161,7 +193,47 @@ export default {
 
     <ModalAdmin />
     <ModalAdminUpdate :reservacionId="reservacionId" />
+
+    <!-- Diálogo de Confirmación -->
+    <Dialog v-model:visible="showDeleteDialog" :header="dialogData.title" :style="{ width: '30vw' }" :modal="true">
+      <div class="center">
+        <i :class="dialogData.icon" style="font-size: 2rem"></i>
+      </div>
+      <div class="flex align-items-center gap-3">
+        <span>{{ dialogData.message }}</span>
+      </div>
+      <template #footer>
+        <Button label="Cancelar" icon="pi pi-times" @click="showDeleteDialog = false" class="p-button-text" />
+        <Button label="Eliminar" icon="pi pi-trash" @click="confirmDelete" severity="danger" autofocus />
+      </template>
+    </Dialog>
+
+    <!-- Diálogo de Resultado -->
+    <Dialog v-model:visible="showResultDialog" :header="dialogData.title" :style="{ width: '350px' }" :modal="true">
+      <div class="center">
+        <i :class="dialogData.icon" style="font-size: 2rem"></i>
+      </div>
+      <div class="flex align-items-center gap-3">
+        <span>{{ dialogData.message }}</span>
+      </div>
+      <template #footer>
+        <Button label="Aceptar" icon="pi pi-check" @click="closeResultDialog" autofocus />
+      </template>
+    </Dialog>
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.text-red-500 {
+  color: #ef4444;
+}
+
+.text-green-500 {
+  color: #22c55e;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+</style>
