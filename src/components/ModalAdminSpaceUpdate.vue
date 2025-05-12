@@ -27,7 +27,7 @@ export default {
             try {
                 const espacioActualizado = await this.actualizarEspacio(this.espacioData);
                 await this.actualizarHorario(espacioActualizado.data.id, this.espacioData.start_time, this.espacioData.end_time);
-                alert('Espacio y horario actualizados con éxito');
+                //alert('Espacio y horario actualizados con éxito');
                 this.espacioData = {
                     nombre: '',
                     descripcion: '',
