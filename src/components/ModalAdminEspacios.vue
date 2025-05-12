@@ -21,7 +21,7 @@ export default {
             try {
                 const espacioCreado = await this.crearEspacio(this.espacioData);
                 await this.crearHorario(espacioCreado.data.id, this.espacioData.start_time, this.espacioData.end_time);
-                alert('Espacio y horario creados con éxito');
+                // alert('Espacio y horario creados con éxito');
                 this.espacioData = {
                     nombre: '',
                     descripcion: '',
