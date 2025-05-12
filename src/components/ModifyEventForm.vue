@@ -385,7 +385,7 @@ export default {
     </div>
 
     <!-- Diálogo de Confirmación -->
-    <Dialog v-model:visible="showDeleteDialog" :header="dialogData.title" :style="{ width: '15vw' }" :modal="true">
+    <Dialog v-model:visible="showDeleteDialog" :header="dialogData.title" :style="{ width: '30vw' }" :modal="true">
         <div class="center">
             <i :class="dialogData.icon" style="font-size: 2rem"></i>
         </div>
