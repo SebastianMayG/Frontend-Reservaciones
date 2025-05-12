@@ -140,7 +140,7 @@ export default {
             this.showDeleteDialog = false;
 
             try {
-                const response = await fetch(`${config.API_URL}/api/reservations/${id}`, {
+                const response = await fetch(`${config.API_URL}/api/reservations/${this.reservationToDelete}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
