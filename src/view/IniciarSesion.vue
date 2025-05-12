@@ -51,6 +51,19 @@
       </form>
     </div>
 
+    <!-- Diálogo de Error -->
+    <Dialog v-model:visible="showErrorDialog" header="Error" :style="{ width: '350px' }" :modal="true">
+      <div class="center">
+        <i class="pi pi-times-circle text-red-500" style="font-size: 2rem"></i>
+      </div>
+      <div class="flex align-items-center gap-3">
+        <span>{{ errorMessage }}</span>
+      </div>
+      <template #footer>
+        <Button label="Aceptar" @click="showErrorDialog = false" class="p-button-primary" autofocus />
+      </template>
+    </Dialog>
+
     <div class="login-background">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
@@ -61,6 +74,8 @@
 <script>
 import FloatLabel from 'primevue/floatlabel';
 import InputText from 'primevue/inputtext';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
 import { config } from '@/config';
 
 export default {
@@ -68,11 +83,15 @@ export default {
   components: {
     FloatLabel,
     InputText,
+    Dialog,
+    Button
   },
   data() {
     return {
       email: '',
       password: '',
+      showErrorDialog: false,
+      errorMessage: ''
     };
   },
   methods: {
@@ -90,24 +109,30 @@ export default {
         });
 
         const data = await response.json();
-        console.log(data);
+        
         if (response.ok) {
           const token = data.token;
           localStorage.setItem('token', token);
           localStorage.setItem('rol', data.data.role);
           localStorage.setItem('id', data.data.id);
           this.setAuthHeader(token);
+          
+          // Redirigir directamente
           if (localStorage.getItem('rol') == 1) {
             this.$router.push('/VisualizarReservas');
           } else {
             this.$router.push('/TusReservaciones');
           }
+          
         } else {
-          alert(data.message || 'Credenciales incorrectas.');
+          // Mostrar diálogo de error
+          this.errorMessage = data.message || 'Credenciales incorrectas.';
+          this.showErrorDialog = true;
         }
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
-        alert('Error al iniciar sesión. Inténtalo de nuevo.');
+        this.errorMessage = 'Error al iniciar sesión. Inténtalo de nuevo.';
+        this.showErrorDialog = true;
       }
     },
     setAuthHeader(token) {
@@ -312,6 +337,29 @@ export default {
   height: 200px;
   bottom: -50px;
   left: -50px;
+}
+
+/* Estilos para el diálogo */
+.center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-3 {
+  gap: 1rem;
 }
 
 @keyframes fadeIn {
