@@ -1,5 +1,51 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
+//import { computed } from 'vue';
+import { config } from '@/config';
+
+const router = useRouter();
+//const menuOpen = ref(false);
+
+// const isLoggedIn = computed(() => {
+//   if (typeof window !== 'undefined') {
+//     return localStorage.getItem('token');
+//   }
+//   return null;
+// });
+
+// const toggleMenu = () => {
+//   menuOpen.value = !menuOpen.value;
+// };
+
+const logout = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    router.push('/IniciarSesion');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${config.API_URL}/api/logout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('rol');
+      localStorage.removeItem('id');
+      router.push('/IniciarSesion');
+    } else {
+      console.error('Error al cerrar sesión:', response);
+      alert('Error al cerrar sesión. Inténtalo de nuevo.');
+    }
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error);
+    alert('Error al cerrar sesión. Inténtalo de nuevo.');
+  }
+};
 </script>
 
 <template>
@@ -10,7 +56,7 @@ import { RouterLink } from 'vue-router';
         <span class="app-name">ClassBooker</span>
       </div>
       
-      <button class="navbar-toggler" @click="toggleMenu">
+      <button class="navbar-toggler" @click="toggleMenu" aria-label="Toggle navigation">
         <span class="toggler-icon"></span>
         <span class="toggler-icon"></span>
         <span class="toggler-icon"></span>
@@ -44,34 +90,19 @@ import { RouterLink } from 'vue-router';
         </ul>
         
         <div class="navbar-actions">
-          <RouterLink to="/IniciarSesion" class="logout-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button @click="logout" class="auth-btn logout-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
             Cerrar sesión
-          </RouterLink>
+          </button>
         </div>
       </div>
     </div>
   </nav>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      menuOpen: false
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.menuOpen = !this.menuOpen;
-    }
-  }
-};
-</script>
 
 <style scoped>
 .navbar {
@@ -103,6 +134,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .app-name {
@@ -170,31 +202,39 @@ export default {
 }
 
 .navbar-actions {
+  display: flex;
+  gap: 10px;
   margin-left: 20px;
 }
 
-.logout-btn {
+.auth-btn {
   color: white;
   text-decoration: none;
   font-weight: 500;
   padding: 8px 16px;
   border-radius: 6px;
-  border: 1px solid white;
   display: flex;
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .logout-btn:hover {
-  background-color: white;
-  color: #265A9C;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Responsive styles */
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0.8rem 1rem;
+  .navbar-container {
+    flex-wrap: wrap;
   }
   
   .navbar-toggler {
@@ -226,7 +266,7 @@ export default {
   .navbar-links {
     flex-direction: column;
     width: 100%;
-    gap: 10px;
+    gap: 5px;
   }
   
   .nav-link {
@@ -236,11 +276,13 @@ export default {
   
   .navbar-actions {
     margin-left: 0;
-    margin-top: 10px;
+    margin-top: 15px;
     width: 100%;
+    flex-direction: column;
+    gap: 10px;
   }
   
-  .logout-btn {
+  .auth-btn {
     justify-content: center;
     width: 100%;
   }
